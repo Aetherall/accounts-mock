@@ -26,8 +26,8 @@ class ExpressTTBody {
 
     if(!canStore) return;
 
-    res.jsonToSend = res.jsonTonSend instanceof Object
-    ? {...res.jsonToSend, [this.accessConfig.name]: accessToken}
+    res.toSend = res.toSend instanceof Object
+    ? {...res.toSend, [this.accessConfig.name]: accessToken}
     : { [this.accessConfig.name]: accessToken }
   }
 
@@ -37,8 +37,8 @@ class ExpressTTBody {
 
     if(!canStore) return;
 
-    res.jsonToSend = res.jsonTonSend instanceof Object
-    ? {...res.jsonToSend, [this.refreshConfig.name]: refreshToken}
+    res.toSend = res.toSend instanceof Object
+    ? {...res.toSend, [this.refreshConfig.name]: refreshToken}
     : { [this.refreshConfig.name]: refreshToken }
   }
 

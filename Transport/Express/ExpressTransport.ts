@@ -49,84 +49,95 @@ class ExpressTransport {
 
     
 
-    // middleware
-    middleware = async (req, res, next) => {
-        // Retrieve access token
-        const accessToken = this.tokenTransport.getAccessToken(req);
+  // middleware
+  middleware = async (req, res, next) => {
+      // Retrieve access token
+      const accessToken = this.tokenTransport.getAccessToken(req);
 
-        if(!accessToken) next(); // If no accessToken from client => do nothing
+      if(!accessToken) next(); // If no accessToken from client => do nothing
 
-        // If there is an accessToken provided by client => try to resume session
-        const user = await this.accountsServer.resumeSession(accessToken);
+      // If there is an accessToken provided by client => try to resume session
+      const user = await this.accountsServer.resumeSession(accessToken);
 
-        // Assign result of session resuming to request object 
-        req.user = user;
-        req.userId = user.id;
-        next();
-    }
+      // Assign result of session resuming to request object 
+      req.user = user;
+      req.userId = user.id;
+      next();
+  }
 
+  send = (res, data) => {
 
-    authenticate = async (req, res) => {
-        // Identify the service used to authenticate
-        const serviceName = req.params.service;
+    const toSend = res.toSend || {};
 
-        // Extract the connection informations from the request
-        const connectionInfo = getConnectionInfo(req)
-
-        // Extract the connection parameters from the request
-        const params = req.body;
-
-        // try to login
-        const { user, sessionId, tokens } = await this.accountsServer.loginWithService(serviceName, params, connectionInfo)
-
-        // set Tokens to request and get response body
-        const responseBody = this.tokenTransport.setTokens(req, res, tokens);
-
-        // Send response to client
-        res.json(responseBody);
-    }
+    res.json({ ...data, ...toSend })
+  }
 
 
+  authenticate = async (req, res) => {
+      // Identify the service used to authenticate
+      const serviceName = req.params.service;
 
-    impersonate = async (req, res ) => {
-        const { username } = req.body;
-        const { accessToken } = this.tokensTransportStorage.getTokens();
+      // Extract the connection informations from the request
+      const connectionInfo = getConnectionInfo(req)
 
-        const connectionInfo = getConnectionInfo(req)
-        const { authorized, tokens, user } = await this.accountsServer.impersonate(accessToken, username, connectionInfo);
+      // Extract the connection parameters from the request
+      const params = req.body;
 
-        const responseBody = this.tokensTransportStorage.setToken(res, tokens);
+      // try to login
+      const { user, sessionId, tokens } = await this.accountsServer.loginWithService(serviceName, params, connectionInfo)
 
-        res.json({...responseBody, authorized, user })
+      // set Tokens to request and get response body
+      this.tokenTransport.setTokens(req, res, tokens);
 
-    } 
+      // Send response
+      this.send(res)
+  }
+
+
+
+  impersonate = async (req, res ) => {
+      const { username } = req.body;
+      const { accessToken } = this.tokenTransport.getAccessToken(req);
+
+      const connectionInfo = getConnectionInfo(req)
+      const { authorized, tokens, user } = await this.accountsServer.impersonate(accessToken, username, connectionInfo);
+
+      this.tokenTransport.setTokens(req, res, tokens);
+
+      this.send(res, { authorized, user })
+
+  } 
     
-    user = async (req, res) => {
-        const { accessToken } = this.tokensTransportStorage.getTokens();
-        const {services, ...user} = await this.accountsServer.resumeSession(accessToken);
-        res.json(user)
-    }
+  user = async (req, res) => {
 
-    refreshTokens = async (req, res) => {
-        const requestTokens = this.tokensTransportStorage.getTokens();
+      const accessToken = this.tokenTransport.getAccessToken(req);
 
-        const connectionInfo = getConnectionInfo(req);
+      const { services, ...user } = await this.accountsServer.resumeSession(accessToken);
 
-        const { tokens, ...refreshedSession } = await this.accountsServer.refreshTokens(requestTokens, connectionInfo);
+      this.send(res, user)
+  }
 
-        const responseBody = this.tokensTransportStorage.setToken(res, tokens);
-    }
+  refreshTokens = async (req, res) => {
 
-    logout = async (req, res) => {
-        const { accessToken } = this.tokensTransportStorage.getTokens();
+      const requestTokens = this.tokenTransport.getTokens(req);
 
-        await this.accountsServer.logout(accessToken);
+      const connectionInfo = getConnectionInfo(req);
 
-        res.json({ message: 'Logged out' });
-    }
+      const { tokens, ...refreshedSession } = await this.accountsServer.refreshTokens(requestTokens, connectionInfo);
 
-    
+      this.tokenTransport.setToken(req, res, tokens);
 
+      this.send(res, refreshedSession);
+  }
 
+  logout = async (req, res) => {
+
+      const accessToken = this.tokenTransport.getAccessToken(req);
+
+      await this.accountsServer.logout(accessToken);
+
+      this.send(res, { message: 'Logged out' })
+      
+  }
 
 }
