@@ -7,21 +7,11 @@ class ExpressTokenTransportManager {
     this.tokenTransport = config.tokenTransport
   }
 
-  setAccessToken = (req, res, accessToken) => {
-    this.tokenTransport.forEach( tokenTransport => {
-      const canStore = tokenTransport.accessConfig.canStore(req);
-      if(!canStore) return;
-      tokenTransport.setAccessToken(res, accessToken);
-    })
-  }
+  setAccessToken = (req, res, accessToken) => 
+    this.tokenTransport.forEach( tokenTransport => tokenTransport.setAccessToken(res, accessToken) )
 
-  setRefreshTokens = (req, res, refreshToken) => {
-    this.tokenTransport.forEach( tokenTransport => {
-      const canStore = tokenTransport.refreshConfig.canStore(req);
-      if(!canStore) return;
-      tokenTransport.setRefreshToken(res, refreshToken);
-    })
-  }
+  setRefreshTokens = (req, res, refreshToken) =>
+    this.tokenTransport.forEach( tokenTransport => tokenTransport.setRefreshToken(res, refreshToken) )
 
   setTokens = (req, res, tokens) => {
     const { accessToken, refreshToken } = tokens;
@@ -35,9 +25,9 @@ class ExpressTokenTransportManager {
     }, null)
 
   getRefreshToken = (req) => this.tokenTransport.reduce( ( a, tokenTransport ) => {
-    const temp = tokenTransport.getRefreshToken(req);
-    return temp instanceof String && temp.length > 0 ? temp : a
-  }, null)
+      const temp = tokenTransport.getRefreshToken(req);
+      return temp instanceof String && temp.length > 0 ? temp : a
+    }, null)
 
   
   getTokens = (req) => ({

@@ -1,23 +1,50 @@
 
+const defaultConfig = {
+  access: {
+    name: 'accessToken',
+    canStore: () => true
+  },
+  refresh: {
+    name: 'refreshToken',
+    canStore: () => true
+  }
+}
+
+
 class ExpressTTSHeaders {
-  public accessToken
-  public refreshToken
+  public accessConfig
+  public refreshConfig
 
   constructor(config) {
-    this.accessToken = config.access || 'accessToken';
-    this.refreshToken = config.refresh || 'refreshToken';
+    this.accessConfig = { ...defaultConfig.access, ...config.access };
+    this.refreshConfig = { ...defaultConfig.refresh, ...config.refresh };
   }
 
-  setAccessToken = (res, accessToken) => {
-    res.set(this.accessToken, accessToken)
+  setAccessToken = (req, res, accessToken) => {
+    const canStore = this.accessConfig.canStore(req);
+    if(!canStore) return;
+    res.set(this.accessConfig.name, accessToken)
   }
 
-  setRefreshToken = (res, refreshToken) => {
-    res.set(this.refreshToken, refreshToken)
+  setRefreshToken = (req, res, refreshToken) => {
+    const canStore = this.refreshConfig.canStore(req);
+    if(!canStore) return;
+    res.set(this.refreshConfig.name, refreshToken)
   }
 
-  getAccessToken = (req) => req.cookie[this.accessToken]
+  setTokens = (req, res, tokens) => {
+    const { accessToken, refreshToken } = tokens
+    this.setAccessToken(req, res, accessToken);
+    this.setRefreshToken(req, res, refreshToken);
+  }
 
-  getRefreshToken = (req) => req.cookie[this.refreshToken]
+  getAccessToken = (req) => req.get(this.accessConfig.name)
+
+  getRefreshToken = (req) => req.get(this.refreshConfig.name)
+
+  getTokens = (req) => ({
+    accessToken: this.getAccessToken(req),
+    refreshToken: this.getRefreshToken(req)
+  })
 
 }
