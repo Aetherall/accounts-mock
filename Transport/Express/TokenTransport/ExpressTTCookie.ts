@@ -55,7 +55,7 @@ class ExpressTTSCookie {
   getRefreshToken = (req) => req.cookie[this.refreshConfig.name]
 
   getTokens = (req) => ({
-    accessToken: this.getAccessToken(req);
+    accessToken: this.getAccessToken(req),
     refreshToken: this.getRefreshToken(req)
   })
 

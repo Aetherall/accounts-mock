@@ -23,7 +23,7 @@ class ExpressTransport {
   private authenticationService;
   private notificationService;
 
-  private tokensTransportStorage;
+  private tokenTransport;
 
   private router;
   private config;
@@ -34,7 +34,7 @@ class ExpressTransport {
     this.authenticationService = config.authenticationService;
     this.notificationService = config.notificationService;
 
-    this.tokensTransportStorage = config.tokensTransportStorage;
+    this.tokenTransport = config.tokenTransport;
   }
 
   buildRouter(){
@@ -52,7 +52,7 @@ class ExpressTransport {
     // middleware
     middleware = async (req, res, next) => {
         // Retrieve access token
-        const { accessToken } = this.tokensTransportStorage.getTokens(req);
+        const accessToken = this.tokenTransport.getAccessToken(req);
 
         if(!accessToken) next(); // If no accessToken from client => do nothing
 
@@ -77,10 +77,10 @@ class ExpressTransport {
         const params = req.body;
 
         // try to login
-        const {user, sessionId, tokens} = await this.accountsServer.loginWithService(serviceName, params, connectionInfo)
+        const { user, sessionId, tokens } = await this.accountsServer.loginWithService(serviceName, params, connectionInfo)
 
         // set Tokens to request and get response body
-        const responseBody = this.tokensTransportStorage.setToken(res, tokens);
+        const responseBody = this.tokenTransport.setTokens(req, res, tokens);
 
         // Send response to client
         res.json(responseBody);
