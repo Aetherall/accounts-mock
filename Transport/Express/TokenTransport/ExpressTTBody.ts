@@ -10,7 +10,6 @@ const defaultConfig = {
   }
 }
 
-
 class ExpressTTBody {
   public accessConfig
   public refreshConfig
@@ -20,33 +19,28 @@ class ExpressTTBody {
     this.refreshConfig = { ...defaultConfig.refresh, ...config.refresh };
   }
 
-  setAccessToken = (req, res, accessToken) => {
-
+  setAccessToken = ( accessToken, tokenContainer ) => {
+    const { req, res } = tokenContainer;
     const canStore = this.accessConfig.canStore(req);
-
     if(!canStore) return;
-
     res.toSend = res.toSend instanceof Object
     ? {...res.toSend, [this.accessConfig.name]: accessToken}
     : { [this.accessConfig.name]: accessToken }
   }
 
-  setRefreshToken = (req, res, refreshToken) => {
-
+  setRefreshToken =  ( refreshToken, tokenContainer ) => {
+    const { req, res } = tokenContainer;
     const canStore = this.refreshConfig.canStore(req);
-
     if(!canStore) return;
-
     res.toSend = res.toSend instanceof Object
     ? {...res.toSend, [this.refreshConfig.name]: refreshToken}
     : { [this.refreshConfig.name]: refreshToken }
   }
 
-  setTokens = (req, res, tokens) => {
+  setTokens = ( tokens, tokenContainer ) => {
     const { accessToken, refreshToken } = tokens
-
-    this.setAccessToken(req, res, accessToken);
-    this.setRefreshToken(req, res, refreshToken);
+    this.setAccessToken(accessToken, tokenContainer);
+    this.setRefreshToken(refreshToken, tokenContainer);
   }
 
   getAccessToken = (req) => req.body[this.accessConfig.name]

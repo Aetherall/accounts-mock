@@ -44,7 +44,7 @@ class ExpressTransport {
       .post(`${this.config.path}/user`, this.user)
       .post(`${this.config.path}/refreshTokens`, this.refreshTokens)
       .post(`${this.config.path}/logout`, this.logout)
-      .post(`${this.config.path}/:service/authenticate`, this.authenticate)
+      .post(`${this.config.path}/:service/:provider?/:action`, this.useService)
   }
 
     
@@ -87,7 +87,7 @@ class ExpressTransport {
       const { user, sessionId, tokens } = await this.accountsServer.loginWithService(serviceName, params, connectionInfo)
 
       // set Tokens to request and get response body
-      this.tokenTransport.setTokens(req, res, tokens);
+      this.tokenTransport.setTokens(tokens, { req, res });
 
       // Send response
       this.send(res)
@@ -102,7 +102,7 @@ class ExpressTransport {
       const connectionInfo = getConnectionInfo(req)
       const { authorized, tokens, user } = await this.accountsServer.impersonate(accessToken, username, connectionInfo);
 
-      this.tokenTransport.setTokens(req, res, tokens);
+      this.tokenTransport.setTokens(tokens, { req, res });
 
       this.send(res, { authorized, user })
 
@@ -125,7 +125,7 @@ class ExpressTransport {
 
       const { tokens, ...refreshedSession } = await this.accountsServer.refreshTokens(requestTokens, connectionInfo);
 
-      this.tokenTransport.setToken(req, res, tokens);
+      this.tokenTransport.setToken(tokens, { req, res });
 
       this.send(res, refreshedSession);
   }
@@ -138,6 +138,23 @@ class ExpressTransport {
 
       this.send(res, { message: 'Logged out' })
       
+  }
+
+  useService = async (req, res) => {
+    // Identify the service
+    const target = req.params;
+
+    // Extract the action parameters
+    const params = req.body;
+    
+    // Extract the connection informations from the request
+    const connectionInfo = getConnectionInfo(req)
+
+    const { tokens, ...response } = await this.authenticationManager.useService(target, params, connectionInfo);
+
+    if(tokens) this.tokenTransport.setTokens(tokens, { req, res });
+
+    this.send(res, response);
   }
 
 }

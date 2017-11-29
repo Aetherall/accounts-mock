@@ -20,22 +20,24 @@ class ExpressTTSHeaders {
     this.refreshConfig = { ...defaultConfig.refresh, ...config.refresh };
   }
 
-  setAccessToken = (req, res, accessToken) => {
+  setAccessToken = ( accessToken, tokenContainer ) => {
+    const { req, res } = tokenContainer;
     const canStore = this.accessConfig.canStore(req);
     if(!canStore) return;
     res.set(this.accessConfig.name, accessToken)
   }
 
-  setRefreshToken = (req, res, refreshToken) => {
+  setRefreshToken = ( refreshToken, tokenContainer ) => {
+    const { req, res } = tokenContainer;
     const canStore = this.refreshConfig.canStore(req);
     if(!canStore) return;
     res.set(this.refreshConfig.name, refreshToken)
   }
 
-  setTokens = (req, res, tokens) => {
+  setTokens = ( tokens, tokenContainer ) => {
     const { accessToken, refreshToken } = tokens
-    this.setAccessToken(req, res, accessToken);
-    this.setRefreshToken(req, res, refreshToken);
+    this.setAccessToken(accessToken, tokenContainer);
+    this.setRefreshToken(refreshToken, tokenContainer);
   }
 
   getAccessToken = (req) => req.get(this.accessConfig.name)

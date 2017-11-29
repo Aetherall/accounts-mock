@@ -97,6 +97,13 @@ const expressPasswordTransport = new ExpressPasswordTransport({
   
 })
 
+const passwordEmail = new PasswordNotification({
+  name:'email',
+  sendEnroll: () => null,
+  sendResetPassword: () => null,
+  sendVerification: () => null
+})
+
 const password = new PasswordService({
   transport: [expressPasswordTransport],
   notification

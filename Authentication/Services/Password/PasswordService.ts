@@ -1,19 +1,28 @@
-class PasswordServer {
+class PasswordService {
   private accountsServer;
   private databaseInterface;
   private tokenManager;
 
-  constructor(){
+  private passwordNotificationManager;
 
+  constructor(config){
+    this.passwordNotificationManager = config.passwordNotificationManager;
   }
 
-  link = (accountsServer) => {
-    this.accountsServer = accountsServer;
-    this.databaseInterface = accountsServer.databaseInterface;
+  useService = (target, params, connectionInfo) => {
+    
+    const actionName = target.action;
+
+    const action = this[actionName];
+
+    if(!action) throw new AccountsError(`[ Accounts - Password ] useService : No action matches ${actionName} `)
+
+    return action( params, connectionInfo )
   }
 
-  public register = async (register) => {
-    const { username, email, password } = register;
+  public register = async (params) => {
+
+    const { username, email, password } = params;
 
     if (!this.validateUsername(username) && !this.validateEmail(email)) throw new Error('Username or Email is required');
 
@@ -33,11 +42,13 @@ class PasswordServer {
 
     const userId = this.databaseInterface.createUser(newUser);
 
-    return userId
+    return { userId }
   }
 
 
-  public verifyEmail = async (token) => {
+  public verifyEmail = async (params) => {
+
+    const { token } = params;
 
     const user = await this.databaseInterface.findUserByEmailVerificationToken(token);
     if (!user) { throw new Error('Verify email link expired') }
@@ -52,9 +63,12 @@ class PasswordServer {
 
     await this.databaseInterface.verifyEmail(user.id, emailRecord.address);
 
+    return { message: 'Email verified' }
   }
 
-  public resetPassword = async (token, newPassword) => {
+  public resetPassword = async (params) => {
+
+    const { token, newPassword } = params;
 
     const user = await this.databaseInterface.findUserByResetPasswordToken(token);
 
@@ -86,9 +100,13 @@ class PasswordServer {
 
     // Changing the password should invalidate existing sessions
     this.databaseInterface.invalidateAllSessions(user.id);
+
+    return { message:'Password Changed' }
   }
 
-  public sendVerificationEmail = async (address) => {
+  public sendVerificationEmail = async (params) => {
+
+    const { address } = params;
 
     if(!address) throw new Error('Invalid email');
 
@@ -104,25 +122,16 @@ class PasswordServer {
 
     await this.databaseInterface.addEmailVerificationToken(user.id, address, token);
 
-    const emailNotificationService = this.accountsServer.notification.getService('email');
-
-
-
-    const verifyEmailMail = emailNotificationService.prepareTemplate(verifyEmail, { address, user, token });
-
-    await emailNotificationService.send(verifyEmailMail);
-    /*const resetPasswordMail = this.accountsServer.prepareMail(
-      address,
-      token,
-      this.server.sanitizeUser(user),
-      'verify-email',
-      this.server.options.emailTemplates.verifyEmail,
-      this.server.options.emailTemplates.from
-    );*/
+    await this.passwordNotificationManager.sendVerify('email',  { address, user, token });
+    
+    return { message: 'Email Sent' }
 
   }
 
-  public sendResetPasswordEmail = async (address) => {
+  public sendResetPasswordEmail = async (params) => {
+
+    const address = params;
+
     if(!address) throw new Error('Invalid email');
 
     const user = await this.databaseInterface.findUserByEmail(address);
@@ -135,13 +144,40 @@ class PasswordServer {
 
     await this.databaseInterface.addResetPasswordToken(user.id, address, token);
 
-    const resetPasswordMail = emailNotificationService.prepareTemplate(resetPassword, { address, user, token });
-    
-    await emailNotificationService.send(resetPasswordMail);
+    await this.passwordNotificationManager.sendVerify('email',  { address, user, token });
+
+    return { message:'email sent' }
 
   }
 
-  public authenticate = async () => {
+  public authenticate = async (params, connectionInfo) => {
     
+    const { username, email, userId, password } = params;
+
+    if(!username && !email && !userId) throw new Error('Username, Email or userId is Required');
+
+    // Fetch the user from database
+    const user = userId ? await this.databaseInterface.findUserById(userId)
+      : username ? await this.databaseInterface.findUserByUsername(username)
+      : email ? await this.databaseInterface.findUserByEmail(email)
+      : null
+
+    if(!user) throw new Error('User Not Found');
+
+    const hash = await this.databaseInterface.findPasswordHash(user.id);
+
+    if (!hash) throw new Error('User has no password set');
+
+    const hashedPassword = this.hashAlgorithm 
+      ? hashPassword(password, this.hashAlgorithm)
+      : password
+
+    const isPasswordValid = await verifyPassword(hashedPassword, hash)
+
+    if (!isPasswordValid) throw new Error('Incorrect password');
+
+    const loginResult = this.accountsServer.loginWithUser(user, connectionInfo);
+
+    return loginResult
   }
 }

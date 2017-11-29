@@ -1,41 +1,49 @@
 class OAuthService {
-  constructor(options) {
-    this.serviceTransport = options.transport
+  
+  private databaseInterface;
+  private authenticationProviders;
+
+  constructor(authenticationProviders) {
+    this.authenticationProviders = authenticationProviders.reduce(
+      (a, authenticationProvider) => a[authenticationProvider.name] = authenticationProvider
+    ,{})
   }
 
-  link = accountsServer => {
-    this.accountsServer = accountsServer
-    this.databaseInterface = accountsServer.databaseInterface
+  useService = (target, params, connectionInfo) => {
+
+    const providerName = target.provider;
+    
+    const provider = this.authenticationProviders[providerName];
+    
+    if(!provider) throw new AccountsError(`[ Accounts - OAuth ] useService : No provider matches ${providerName} `)
+    
+    const actionName = target.action;
+
+    const OAuthAction = this[actionName];
+
+    if(OAuthAction) return OAuthAction(provider, params, connectionInfo);
+
+    const providerAction = provider[actionName];
+
+    if(!providerAction) throw new AccountsError(`[ Accounts - OAuth ] useService : No action matches ${actionName} `)
+
+    return providerAction( params, connectionInfo )
   }
 
-  public authenticate = async params => {
-    if (!params.provider || !this.providers[param.provider])
-      throw new Error('Invalid provider')
+  public authenticate = async (provider, params, connectionInfo) => {
 
-    const userProvider = this.providers[param.provider]
+    const oauthUser = await provider.authenticate(params)
 
-    const oauthUser = await userProvider.authenticate(params)
+    let user = await this.databaseInterface.findUserByServiceId( provider.name, oauthUser.id )
 
-    let user = await this.databaseInterface.findUserByServiceId(
-      params.provider,
-      oauthUser.id
-    )
-
-    if (!user && oauthUser.email)
-      user = await this.databaseInterface.findUserByEmail(oauthUser.email)
+    if (!user && oauthUser.email) user = await this.databaseInterface.findUserByEmail(oauthUser.email)
 
     if (!user) {
-      const userId = await this.databaseInterface.createUser({
-        email: oauthUser.email,
-        profile: oauthUser.profile
-      })
-
+      const userId = await this.databaseInterface.createUser({ email: oauthUser.email })
       user = await this.databaseInterface.findUserById(userId)
-    } else {
-      // If user exist, attmpt to update profile
-      this.databaseInterface.setProfile(user.id, oauthUser.profile)
     }
-    await this.databaseInterface.setService(user.id, params.provider, oauthUser)
+    await this.databaseInterface.setService(user.id, provider.name, oauthUser)
+
     return user
   }
 }

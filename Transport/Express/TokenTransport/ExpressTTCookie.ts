@@ -30,24 +30,26 @@ class ExpressTTSCookie {
     this.refreshConfig = { ...defaultCookieConfig.refresh, ...config.refreshCookie }
   }
 
-  setAccessToken = (req, res, accessToken) => {
+  setAccessToken = ( accessToken, tokenContainer ) => {
+    const { req, res } = tokenContainer;
     const canStore = this.accessConfig.canStore(req);
     if(!canStore) return;
     const { name, ...accessConfig } = this.accessConfig;
     res.cookie(name, accessToken, accessConfig)
   }
 
-  setRefreshToken = (req, res, refreshToken) => {
+  setRefreshToken = ( refreshToken, tokenContainer ) => {
+    const { req, res } = tokenContainer;
     const canStore = this.refreshConfig.canStore(req);
     if(!canStore) return;
     const { name, ...refreshConfig } = this.refreshConfig;
     res.cookie(name, refreshToken, refreshConfig)
   }
 
-  setTokens = (req, res, tokens) => {
-    const { accessToken, refreshToken } = tokens;
-    this.setAccessToken(req, res, accessToken);
-    this.setRefreshToken(req, res, refreshToken)
+  setTokens = ( tokens, tokenContainer ) => {
+    const { accessToken, refreshToken } = tokens
+    this.setAccessToken(accessToken, tokenContainer);
+    this.setRefreshToken(refreshToken, tokenContainer);
   }
 
   getAccessToken = (req) => req.cookie[this.accessConfig.name]

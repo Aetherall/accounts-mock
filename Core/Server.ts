@@ -19,19 +19,6 @@ class AccountsServer {
     }
 
 
-
-    // loginWithService( 'password', { username: '', password: ''}, connectionInfo )
-    loginWithService = async (serviceName, params, connectionInfo) => {
-
-        const service = this.services.find(service => service.name === serviceName);
-        if(!service) throw new AccountsError(`[ Accounts - Server ] LoginWithService : No service matches ${serviceName}`);
-
-        const user = await service.authenticate(params);
-        if(!user) throw new AccountsError(`[ Accounts - Server ] LoginWithService : Service ${serviceName} was not able to authenticate user`);
-
-        return this.loginWithUser(user, connectionInfo);
-    }
-
     loginWithUser = async (user, connectionInfo) => {
         const { ip, userAgent } = connectionInfo;
 
