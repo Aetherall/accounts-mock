@@ -56,7 +56,7 @@ class AccountsServer {
 
         if (!isAuthorized) return { authorized: false }
 
-        /*const newSessionId = await this.databaseInterface.createSession( impersonatedUser.id, connectionInfo, { impersonatorUserId: user.id });
+        const newSessionId = await this.databaseInterface.createSession( impersonatedUser.id, connectionInfo, { impersonatorUserId: user.id });
 
         const impersonationTokens = this.createTokens(newSessionId, true);
 
@@ -64,9 +64,9 @@ class AccountsServer {
             authorized: true,
             tokens: impersonationTokens,
             user: this.sanitizeUser(impersonatedUser),
-          };
+        };
 
-          return impersonationResult;*/
+        return impersonationResult;
     }
     
     createTokens = (sessionId, isImpersonated) => {

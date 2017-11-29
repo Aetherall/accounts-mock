@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import requestIp from 'request-ip';
+import { getClientIp } from 'request-ip';
 
 export const getUserAgent = req => {
   let userAgent = req.headers['user-agent'] || '';
@@ -13,7 +13,7 @@ export const getUserAgent = req => {
 
 const getConnectionInfo = (req) => ({
     userAgent: getUserAgent(req),
-    ip: requestIp.getClientIp(req)
+    ip: getClientIp(req)
 })
 
 class ExpressTransport {
