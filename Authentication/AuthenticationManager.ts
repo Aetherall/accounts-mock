@@ -19,12 +19,7 @@ class AuthenticationManager {
     if(!authenticationService) throw new AccountsError(`[ Accounts - AuthenticationManager ] useService : Service ${service} not found`);
 
     return authenticationService.useService(serviceParams, params, connectionInfo );
-
-    const serviceAction = authenticationService[ first ];
-
-    if(!serviceAction) throw new AccountsError(`[ Accounts - AuthenticationManager ] useService : Service ${service} has no action named ${action}`);
-
-    return serviceAction( params, connectionInfo );
+    
   }
 
 }
