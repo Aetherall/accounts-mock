@@ -9,14 +9,14 @@ class PasswordService {
     this.passwordNotificationManager = config.passwordNotificationManager;
   }
 
-  useService = (target, params, connectionInfo) => {
-    
+  public useService = (target, params, connectionInfo) => {
+
     const actionName = target.action;
 
     const action = this[actionName];
 
     if(!action) throw new AccountsError(`[ Accounts - Password ] useService : No action matches ${actionName} `)
-
+    
     return action( params, connectionInfo )
   }
 

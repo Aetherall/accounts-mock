@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb';
-import { get } from 'lodash';
+import { get, merge } from 'lodash';
 
 const toMongoID = objectId => {
   if (typeof objectId === 'string') {
@@ -18,13 +18,11 @@ export interface MongoOptionsType {
     createdAt: string;
     updatedAt: string;
   };
-  // Should the user collection use _id as string or ObjectId, default 'true'.
+  // Should the collection use _id as string or ObjectId, default 'true'.
   useMongoId?: {
     user?: boolean;
     session?: boolean;
   };
-  // Should the session collection use _id as string or ObjectId, default 'true'.
-  convertSessionIdToMongoObjectId?: boolean;
   // Perform case intensitive query for user name, default 'true'.
   caseSensitiveUserName?: boolean;
   // Function that generate the id for new objects.
@@ -33,17 +31,53 @@ export interface MongoOptionsType {
   dateProvider?: (date?: Date) => any;
 }
 
-class MongoInterface {
+const defaultConfiguration = {
+  userCollectionName: 'users',
+  sessionCollectionName: 'sessions',
+  idProvider: null,
+  dateProvider: null,
+  caseSensitiveUserName: true,
+  timestamps: {
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  },
+  useMongoId:{
+    user: true,
+    session: true
+  }
+}
 
-  constructor(config){
+class MongoInterface {
+  
+  private config;
+
+  private db;
+
+  private userCollection;
+
+  private sessionCollection;
+
+  constructor(db, config){
+
+    this.config = merge({},defaultConfiguration, config);
     
+    this.waitForDatabaseConnection(db)
   }
 
-  mongoId = (id, userOrSession) => this.useMongoId[userOrSession]
-    ? toMongoID(id)
-    : id
+  waitForDatabaseConnection = async (db) => {
+    // await to resolve connection to database
+    this.db = await db;
 
+    this.userCollection = db.collection(this.config.userCollectionName);
 
+    this.sessionCollection = db.collection(this.config.sessionCollectionName);
+  }
+
+  mongoId = (id, userOrSession) => this.config.useMongoId[userOrSession] ? toMongoID(id) : id
+
+  provideId = () => this.config.idProvider && { _id: this.config.idProvider() }
+
+  
 
   createUser = async ({ email, username, password }) => {
 
@@ -53,12 +87,12 @@ class MongoInterface {
       },
       ...email && { emails: [{ address: email.toLowerCase(), verified: false }] },
       ...username && { username },
-      ...this.idProvider && { _id: this.idProvider() },
+      ...this.provideId(),
       createdAt: Date.now(),
       updatedAt: Date.now()
     }
 
-    const ret = await this.collection.insertOne(user);
+    const ret = await this.userCollection.insertOne(user);
 
     return ret.ops[0]._id;
 
@@ -66,9 +100,9 @@ class MongoInterface {
 
   public findUserById = async (userId: string) => {
 
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
 
-    const user = await this.collection.findOne({ _id: id });
+    const user = await this.userCollection.findOne({ _id: id });
 
     if (user) user.id = user._id;
 
@@ -81,7 +115,7 @@ class MongoInterface {
       ? { username }
       : { $where: `obj.username && (obj.username.toLowerCase() === "${username.toLowerCase()}")` }
     
-    const user = await this.collection.findOne(filter);
+    const user = await this.userCollection.findOne(filter);
 
     if (user) user.id = user._id;
 
@@ -90,7 +124,7 @@ class MongoInterface {
 
   public findPasswordHash = async ( userId: string ): Promise <string | null> => {
 
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
 
     const user = await this.findUserById(id);
 
@@ -104,7 +138,7 @@ class MongoInterface {
 
     const filter = { 'services.email.verificationTokens.token': token }
 
-    const user = await this.collection.findOne(filter);
+    const user = await this.userCollection.findOne(filter);
 
     if (user) user.id = user._id
 
@@ -115,7 +149,7 @@ class MongoInterface {
 
     const filter = { 'services.email.reset.token': token }
 
-    const user = await this.collection.findOne(filter);
+    const user = await this.userCollection.findOne(filter);
     
     if (user) user.id = user._id
     
@@ -126,7 +160,7 @@ class MongoInterface {
 
     const filter = { [`services.${serviceName}.id`]: serviceId }
 
-    const user = await this.collection.findOne(filter);
+    const user = await this.userCollection.findOne(filter);
     
     if (user) user.id = user._id
     
@@ -135,7 +169,7 @@ class MongoInterface {
 
   public addEmail = async ( userId: string, newEmail: string, verified: boolean ): Promise <void> => {
 
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
 
     const filter = { _id: id };
 
@@ -146,7 +180,7 @@ class MongoInterface {
       $set: { [this.timestamps.updatedAt]: Date.now() },
     }
 
-    const ret = await this.collection.update(filter, modifier);
+    const ret = await this.userCollection.update(filter, modifier);
 
     if (ret.result.nModified === 0) throw new Error('User not found');
   }
@@ -154,7 +188,7 @@ class MongoInterface {
 
   public removeEmail = async (userId: string, email: string): Promise <void> => {
 
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
     
     const filter = { _id: id };
 
@@ -163,14 +197,14 @@ class MongoInterface {
       $set: { [this.timestamps.updatedAt]: Date.now() },
     }
 
-    const ret = await this.collection.update(filter, modifier);
+    const ret = await this.userCollection.update(filter, modifier);
 
     if (ret.result.nModified === 0) throw new Error('User not found');
   }
 
   public verifyEmail = async ( userId: string, email: string ): Promise <void> => {
 
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
 
     const filter = { _id: id, 'emails.address': email };
 
@@ -182,14 +216,14 @@ class MongoInterface {
       $pull: { 'services.email.verificationTokens': { address: email } },
     }
 
-    const ret = await this.collection.update( filter, modifier );
+    const ret = await this.userCollection.update( filter, modifier );
 
     if (ret.result.nModified === 0) throw new Error('User not found');
   }
 
   public setUsername = async (userId: string, newUsername: string): Promise <void> => {
 
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
 
     const filter = { _id: id };
 
@@ -200,14 +234,14 @@ class MongoInterface {
       }
     }
     
-    const ret = await this.collection.update( filter, modifier );
+    const ret = await this.userCollection.update( filter, modifier );
 
     if (ret.result.nModified === 0) throw new Error('User not found');
   }
 
   public setPassword = async ( userId: string, newPassword: string ): Promise<void> => {
 
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
 
     const filter = { _id: id };
 
@@ -221,29 +255,154 @@ class MongoInterface {
       },
     }
 
-    const ret = await this.collection.update( filter, modifier );
+    const ret = await this.userCollection.update( filter, modifier );
     
     if (ret.result.nModified === 0) throw new Error('User not found');
   }
 
+
+
   public setService = async ( userId: string, serviceName: string, service: object ): Promise<object> => {
     
-    const id = this.mongoId(userId);
+    const id = this.mongoId(userId, 'user');
 
-    
+    const filter = { _id: id };
 
-    await this.collection.update(
-      { _id: id },
-      {
-        $set: {
-          [`services.${serviceName}`]: service,
-          [this.options.timestamps.updatedAt]: Date.now(),
-        },
-      }
-    );
+    const modifier = {
+      $set: {
+        [`services.${serviceName}`]: service,
+        [this.options.timestamps.updatedAt]: Date.now(),
+      },
+    }
+
+    const ret = await this.userCollection.update( filter, modifier );
+    //added =>
+    if (ret.result.nModified === 0) throw new Error('User not found');
+
     return service;
   }
 
+  public createSession = async ( userId: string, ip?: string, userAgent?: string, extraData?: object ): Promise<string> => {
+
+    const session = {
+      ...this.provideId(),
+      userId,
+      userAgent,
+      ip,
+      extraData,
+      valid: true,
+      [this.options.timestamps.createdAt]: this.options.dateProvider(),
+      [this.options.timestamps.updatedAt]: this.options.dateProvider(),
+    };
+
+    const ret = await this.sessionCollection.insertOne(session);
+
+    return ret.ops[0]._id;
+  }
+
+  public updateSession = async ( sessionId: string, ip: string, userAgent: string ): Promise<void> => {
+
+    const id = this.mongoId(sessionId, 'session');
+
+    const filter = { _id: id };
+    
+    const modifier = {
+      $set: {
+        ip,
+        userAgent,
+        [this.options.timestamps.updatedAt]: this.options.dateProvider(),
+      }
+    }
+
+    await this.sessionCollection.update( filter, modifier );
+  }
+
+  public invalidateSession = async (sessionId: string): Promise<void> => {
+
+    const id = this.mongoId(sessionId, 'session');
+
+    const filter = { _id: id };
+    
+    const modifier = {
+      $set: {
+        valid: false,
+        [this.options.timestamps.updatedAt]: this.options.dateProvider(),
+      }
+    }
+
+    await this.sessionCollection.update( filter, modifier );
+  }
+
+  public invalidateAllSessions = async (userId: string): Promise<void> => {
+
+    const id = this.mongoId(userId, 'user');
+
+    const filter = { userId: id };
+
+    const modifier = {
+      $set: {
+        valid: false,
+        [this.options.timestamps.updatedAt]: this.options.dateProvider(),
+      }
+    }
+
+    await this.sessionCollection.updateMany( filter, modifier );
+  }
+
+  public findSessionById = async (sessionId: string): Promise <SessionType | null> => {
+
+    const id = this.mongoId(sessionId, 'session');
+
+    const filter = { _id: id }
+
+    return this.sessionCollection.findOne(filter);
+  }
+
+  public addEmailVerificationToken = async ( userId: string, email: string, token: string ): Promise <void> => {
+
+    const id = this.mongoId(userId, 'user');
+    
+    const filter = { _id: id };
+
+    const modifier = {
+      $push: {
+        'services.email.verificationTokens': {
+          token,
+          address: email.toLowerCase(),
+          when: Date.now(),
+        },
+      },
+    }
+
+    await this.userCollection.update(filter, modifier);
+  }
+
+  public addResetPasswordToken = async ( userId: string, email: string, token: string, reason: string = 'reset' ): Promise<void> => {
+    
+    const id = this.mongoId(userId, 'user');
+
+    const filter = { _id: id };
+    
+    const modifier = {
+      $push: {
+        'services.password.reset': {
+          token,
+          address: email.toLowerCase(),
+          when: Date.now(),
+          reason,
+        },
+      },
+    }
+
+    await this.userCollection.update(filter, modifier);
+  }
+
+  public setResetPassword = async ( userId: string, email: string, newPassword: string ): Promise<void> => {
+
+    const id = this.mongoId(userId, 'user');
+
+    return this.setPassword(id, newPassword);
+  }
 
 
 }

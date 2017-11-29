@@ -34,27 +34,33 @@ class AccountsServer {
 
     impersonate = async (accessToken, username, connectionInfo) => {
 
-        if (!isString(accessToken)) throw new AccountsError('[ Accounts - Server ] Impersonate : An accessToken is required');
+        if (!isString(accessToken)) 
+            throw new AccountsError('[ Accounts - Server ] Impersonate : An accessToken is required');
 
         await this.tokenManager.decode(accessToken);
 
         const session = await this.findSessionByAccessToken(accessToken);
 
-        if (!session.valid) throw new AccountsError('Session is not valid for user')
+        if (!session.valid) 
+            throw new AccountsError('Session is not valid for user')
 
         const user = await this.databaseInterface.findUserById(session.userId);
 
-        if (!user) throw new AccountsError('User not found')
+        if (!user) 
+            throw new AccountsError('User not found')
 
         const impersonatedUser = await this.databaseInterface.findUserByUsername(username);
 
-        if (!impersonatedUser) throw new AccountsError(`User ${username} not found`)
+        if (!impersonatedUser) 
+            throw new AccountsError(`User ${username} not found`)
 
-        if (!this.options.impersonationAuthorize) return { authorized: false }
+        if (!this.options.impersonationAuthorize) 
+            return { authorized: false }
 
         const isAuthorized = await this.options.impersonationAuthorize( user, impersonatedUser );
 
-        if (!isAuthorized) return { authorized: false }
+        if (!isAuthorized) 
+            return { authorized: false }
 
         const newSessionId = await this.databaseInterface.createSession( impersonatedUser.id, connectionInfo, { impersonatorUserId: user.id });
 
@@ -76,23 +82,28 @@ class AccountsServer {
     }
 
     refreshTokens = async (tokens, connectionInfo) => {
-        const { accessToken, refreshToken } = tokens ;
 
-        if (!isString(accessToken) || !isString(refreshToken)) throw new AccountsError('[ Accounts - Server ] RefreshTokens : An accessToken and refreshToken are required')
+        const { accessToken, refreshToken } = tokens;
+
+        if (!isString(accessToken) || !isString(refreshToken)) 
+            throw new AccountsError('[ Accounts - Server ] RefreshTokens : An accessToken and refreshToken are required')
         
         await this.tokenManager.decode(refreshToken);
 
         const sessionId = await this.tokenManager.decode(accessToken);
-
+        
         const session = await this.databaseInterface.findSessionById(sessionId);
 
-        if(!session) throw new AccountsError('Session not found');
+        if(!session) 
+            throw new AccountsError('Session not found');
 
-        if(!session.valid) throw new AccountsError('Session is no longer valid', { id: session.userId })
+        if(!session.valid) 
+            throw new AccountsError('Session is no longer valid', { id: session.userId })
 
         const user = await this.databaseInterface.findUserById(session.userId);
 
-        if(!user) throw new AccountsError('User not found', { id: session.userId });
+        if(!user) 
+            throw new AccountsError('User not found', { id: session.userId });
 
         const newTokens = this.createTokens(sessionId);
 
