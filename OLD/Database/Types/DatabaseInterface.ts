@@ -1,0 +1,23 @@
+interface DatabaseInterface {
+  createUser():string;
+  findUserById
+  findUserByUsername
+  findPasswordHash
+  findUserByEmailVerificationToken
+  findUserByResetPasswordToken
+  findUserByServiceId
+  addEmail
+  removeEmail
+  verifyEmail
+  setUsername
+  setPassword
+  setService
+  createSession
+  updateSession
+  invalidateSession
+  invalidateAllSessions
+  findSessionById
+  addEmailVerificationToken
+  addResetPasswordToken
+  setResetPassword
+}
