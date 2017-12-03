@@ -2,7 +2,7 @@ export interface LoginResult {
   
   sessionId: string;
 
-  user: UserClean;
+  user: UserSafe;
 
   tokens: Tokens;
 }

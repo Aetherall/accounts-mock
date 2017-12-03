@@ -1,6 +1,6 @@
 import { ConnectionInformations } from '../../Types/ConnectionInformations';
 import { TokenTransport } from '../../Types/TokenTransport';
-import { UserClean } from '../../Types/UserClean';
+import { UserSafe } from '../../Types/UserSafe';
 
 import { ExpressTransportConfiguration } from '../types/ExpressTransportConfiguration';
 
@@ -50,7 +50,7 @@ export default class ExpressTransport {
 		if(!accessToken) next(); // If no accessToken from client => do nothing
 
 		// If there is an accessToken provided by client => try to resume session
-		const user: UserClean = await this.accountsServer.resumeSession(accessToken);
+		const user: UserSafe = await this.accountsServer.resumeSession(accessToken);
 
 		// Assign result of session resuming to request object 
 		req.user = user;
@@ -88,7 +88,7 @@ export default class ExpressTransport {
 
       const accessToken: string | null = this.tokenTransport.getAccessToken(req);
 
-      const user : UserClean = await this.accountsServer.resumeSession(accessToken);
+      const user : UserSafe = await this.accountsServer.resumeSession(accessToken);
 
       this.send(res, user)
   }

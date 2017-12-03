@@ -8,7 +8,7 @@ import { DatabaseInterface } from "../../Types/DatabaseInterface";
 import { ConnectionInformations } from "../../Types/ConnectionInformations";
 import { User } from "../../Types/User";
 import { Session } from "../../Types/Session";
-import { UserClean } from "../../Types/UserClean";
+import { UserSafe } from "../../Types/UserSafe";
 import { Tokens } from "../../Types/Tokens";
 import { LoginResult } from "../../Types/LoginResult";
 import { ImpersonationResult } from "../../Types/ImpersonationResult";
@@ -100,7 +100,7 @@ export default class AccountsServer {
 			refreshToken: this.tokenManager.generateRefresh()
 		}
 
-		const user: UserClean = this.sanitizeUser(dbUser);
+		const user: UserSafe = this.sanitizeUser(dbUser);
 
 		const loginResult: LoginResult = { user, sessionId, tokens };
 
@@ -140,7 +140,7 @@ export default class AccountsServer {
 
 		const impersonationTokens: Tokens = this.createTokens(newSessionId, true);
 
-		const user: UserClean = this.sanitizeUser(impersonatedUser);
+		const user: UserSafe = this.sanitizeUser(impersonatedUser);
 
 		const impersonationResult: ImpersonationResult = {
 				authorized: true,
@@ -220,7 +220,7 @@ export default class AccountsServer {
 	}
   
   
-	resumeSession = async ( accessToken: string ) : Promise <UserClean> => {
+	resumeSession = async ( accessToken: string ) : Promise <UserSafe> => {
 
 		const session: Session = await this.findSessionByAccessToken(accessToken);
 
@@ -234,7 +234,7 @@ export default class AccountsServer {
 
 		if (this.resumeSessionValidator) await this.resumeSessionValidator(dbUser, session);
 
-		const user: UserClean = this.sanitizeUser(dbUser);
+		const user: UserSafe = this.sanitizeUser(dbUser);
 
 		return user;
 	}
@@ -258,7 +258,7 @@ export default class AccountsServer {
 
 	}
 
-	sanitizeUser = ( user: User ) : UserClean => omit(user, ['services']);
+	sanitizeUser = ( user: User ) : UserSafe => omit(user, ['services']);
   
       
   

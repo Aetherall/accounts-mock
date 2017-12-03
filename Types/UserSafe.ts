@@ -1,6 +1,6 @@
 import { EmailRecord } from "./EmailRecord";
 
-export interface UserClean {
+export interface UserSafe {
 
   username?: string;
 

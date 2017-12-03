@@ -6,7 +6,7 @@ export default class NotificationPluginEmailPassword implements NotificationPlug
 
   public name: string = 'password';
 
-  private from: string;
+  private from: string | null;
 
   constructor( config: NotificationPluginEmailPasswordConfiguration ){
 

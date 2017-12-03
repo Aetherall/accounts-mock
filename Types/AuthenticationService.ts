@@ -5,7 +5,7 @@ export interface AuthenticationService {
 
   name: string;
 
-  useService( target: any, params: any, connectionInfos: ConnectionInformations)
+  useService( target: any, params: any, connectionInfos: ConnectionInformations) : any
 
 }
 

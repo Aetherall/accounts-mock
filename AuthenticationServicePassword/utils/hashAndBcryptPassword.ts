@@ -1,10 +1,10 @@
 import { HashAlgorithm } from "../types/HashAlgorithm";
-import { Password } from "../types/PasswordType";
+import { Password } from "../types/Password";
 ;
 import { bcryptPassword } from "./bcryptPassword";
 
 
-export const getHashAndBcryptPassword = ( hashPasswordWithAlgorithm: Function ) => ( password: PasswordType ) : Promise <string> => {
+export const getHashAndBcryptPassword = ( hashPasswordWithAlgorithm: Function ) => ( password: Password ) : Promise <string> => {
 
     const hashedPassword: string = hashPasswordWithAlgorithm( password );
 

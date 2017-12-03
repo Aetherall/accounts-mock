@@ -1,5 +1,5 @@
 import { Tokens } from "./Tokens";
-import { UserClean } from "./UserClean";
+import { UserSafe } from "./UserSafe";
 
 export interface ImpersonationResult {
   
@@ -7,6 +7,6 @@ export interface ImpersonationResult {
 
   tokens?: Tokens;
 
-  user?: UserClean;
+  user?: UserSafe;
 
 }
