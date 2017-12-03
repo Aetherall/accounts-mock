@@ -1,6 +1,11 @@
+import { LoginResult } from '../../Types/LoginResult';
 import { AuthenticationService } from "../../Types/AuthenticationService";
 import AccountsServer from "../../AccountsServer/src/AccountsServer";
 import { DatabaseInterface } from "../../Types/DatabaseInterface";
+import { AuthenticationProvidersOAuth, AuthenticationProviderOAuth } from "../../Types/AuthenticationProviderOAuth";
+import { AuthenticationServiceOAuthConfiguration } from "../types/AuthenticationServiceOAuthConfiguration";
+import { ConnectionInformations } from "../../Types/ConnectionInformations";
+import { User } from '../../Types/User';
 
 export default class AuthenticationServiceOAuth implements AuthenticationService {
   
@@ -10,53 +15,56 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
 
   private databaseInterface: DatabaseInterface;
 
-  private authenticationProviders: AuthenticationProviders;
+  private authenticationProviders: AuthenticationProvidersOAuth;
 
-  constructor(...authenticationProviders) {
-    this.authenticationProviders = authenticationProviders.reduce(
-      (a, authenticationProvider) => a[authenticationProvider.name] = authenticationProvider
+  constructor(config: AuthenticationServiceOAuthConfiguration) {
+
+    this.authenticationProviders = config.authenticationProviders.reduce(
+      ( a: AuthenticationProvidersOAuth, authenticationProvider: AuthenticationProviderOAuth ) =>
+      a[authenticationProvider.name] = authenticationProvider
     ,{})
+
   }
 
-  useService = (target, params, connectionInfo) => {
+  useService = (target, params, connectionInfo: ConnectionInformations ) : any => {
 
-    const providerName = target.provider;
+    const providerName: string = target.provider;
     
-    const provider = this.authenticationProviders[providerName];
+    const provider: AuthenticationProviderOAuth = this.authenticationProviders[providerName];
     
-    if(!provider) throw new AccountsError(`[ Accounts - OAuth ] useService : No provider matches ${providerName} `)
+    if(!provider) throw new Error(`[ Accounts - OAuth ] useService : No provider matches ${providerName} `)
     
-    const actionName = target.action;
+    const actionName: string = target.action;
 
-    const OAuthAction = this[actionName];
+    const OAuthAction: Function = this[actionName];
 
     if(OAuthAction) return OAuthAction(provider, params, connectionInfo);
 
-    const providerAction = provider[actionName];
+    const providerAction: Function = provider[actionName];
 
-    if(!providerAction) throw new AccountsError(`[ Accounts - OAuth ] useService : No action matches ${actionName} `)
+    if(!providerAction) throw new Error(`[ Accounts - OAuth ] useService : No action matches ${actionName} `)
 
     return providerAction( params, connectionInfo )
   }
 
-  public authenticate = async (provider, params, connectionInfo) => {
+  public authenticate = async ( provider: AuthenticationProviderOAuth , params, connectionInfo: ConnectionInformations ) : Promise <LoginResult> => {
 
-    const oauthUser = await provider.authenticate(params)
+    const oauthUser: any = await provider.authenticate(params)
 
-    let user = await this.databaseInterface.findUserByServiceId( provider.name, oauthUser.id )
+    let user: User = await this.databaseInterface.findUserByServiceId( provider.name, oauthUser.id )
 
     if (!user && oauthUser.email) user = await this.databaseInterface.findUserByEmail(oauthUser.email)
 
     if (!user) {
       
-      const userId = await this.databaseInterface.createUser({ email: oauthUser.email })
+      const userId: string = await this.databaseInterface.createUser({ email: oauthUser.email })
 
       user = await this.databaseInterface.findUserById(userId)
     }
 
     await this.databaseInterface.setService(user.id, provider.name, oauthUser)
 
-    const loginResult = this.accountsServer.loginWithUser(user, connectionInfo);
+    const loginResult: LoginResult = await this.accountsServer.loginWithUser(user, connectionInfo);
     
     return loginResult
 

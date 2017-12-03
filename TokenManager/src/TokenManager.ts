@@ -54,5 +54,5 @@ export default class TokenManager implements TokenManagerInterface {
 
     decode = async ( token: string, ignoreExpiration: boolean = false ) : Promise <TokenPayload> => 
         await jwt.verify(token, this.secret, { ignoreExpiration } )
-        .catch( ( err: Error ) => { throw new AccountsError(' [ Accounts - TokenManager ] Token is invalid ') } )
+        .catch( ( err: Error ) => { throw new Error(' [ Accounts - TokenManager ] Token is invalid ') } )
 }

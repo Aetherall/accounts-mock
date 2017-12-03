@@ -12,6 +12,6 @@ export interface TokenTransport {
 
   setTokens( tokens: Tokens, transportContainer: object ) : void;
   
-  getTokens( transportContainer: object ) : void;
+  getTokens( transportContainer: object ) : Tokens;
 
 }

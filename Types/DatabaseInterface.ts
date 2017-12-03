@@ -4,11 +4,13 @@ import { ConnectionInformations } from "./ConnectionInformations";
 
 export interface DatabaseInterface {
 
-  createUser({ email, username, password } : { email: string, username: string, password: string }) : Promise <string>;
+  createUser({ email, username, password } : { email?: string, username?: string, password?: string }) : Promise <string>;
 
   findUserById( userId: string ) : Promise <User>;
 
   findUserByUsername( username: string ) : Promise <User>;
+
+  findUserByEmail( email: string ) : Promise <User>;
   
   findUserByEmailVerificationToken( token: string ) : Promise <User>;
   
@@ -42,7 +44,7 @@ export interface DatabaseInterface {
 
   addEmailVerificationToken( userId: string, email: string, token: string ): Promise <void>
 
-  addResetPasswordToken( userId: string, email: string, token: string, reason: string ): Promise <void>
+  addResetPasswordToken( userId: string, email: string, token: string, reason?: string ): Promise <void>
 
   setResetPassword( userId: string, email: string, newPassword: string ): Promise <void>
 }

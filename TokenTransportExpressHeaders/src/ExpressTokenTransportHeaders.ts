@@ -1,7 +1,8 @@
-import { TokenTransport } from "../Types/TokenTransport";
-import { ETTHConfiguration } from "./Types/ETTHConfiguration";
-import { ETTHTokenConfiguration } from "./Types/ETTHTokenConfiguration";
-import { Tokens } from "../Types/Tokens";
+import { TokenTransport } from "../../Types/TokenTransport";
+import { Tokens } from "../../Types/Tokens";
+
+import { ETTHConfiguration } from "../types/ETTHConfiguration";
+import { ETTHTokenConfiguration } from "../types/ETTHTokenConfiguration";
 
 
 const defaultConfig = {

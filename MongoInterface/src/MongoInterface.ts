@@ -87,6 +87,17 @@ export default class MongoInterface implements DatabaseInterface {
     return user;
   }
 
+  public findUserByEmail = async ( email: string ): Promise <User | null> => {
+
+    const filter = { 'emails.address': email.toLowerCase() }
+
+    const user = await this.userCollection.findOne(filter);
+
+    if (user) user.id = user._id;
+
+    return user;
+  }
+
   public findUserByUsername = async ( username: string ): Promise <User | null> => {
 
     const filter = this.config.caseSensitiveUserName

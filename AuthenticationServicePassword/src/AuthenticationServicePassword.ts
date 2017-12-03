@@ -1,29 +1,31 @@
+import TokenManager from '../../TokenManager/src/TokenManager';
+import AccountsServer from '../../AccountsServer/src/AccountsServer';
+
 import { AuthenticationService } from '../../Types/AuthenticationService';
 import { DatabaseInterface } from '../../Types/DatabaseInterface';
+
 import { ConnectionInformations } from '../../Types/ConnectionInformations';
+
 import { User } from '../../Types/User';
-import { getFirstUserEmail } from '../../../../packages/accounts/packages/server/src/utils';
-import { LoginResult } from '../../Types/LoginResult';
-
-
-import { merge } from 'lodash';
-import { UserPasswordRegistration } from '../types/UserPasswordRegistration';
-import { RegistrationResult } from '../../Types/RegistrationResult';
-import { Message } from '../../Types/Message';
+import { TokenRecord } from '../../Types/TokenRecord';
 import { EmailRecord } from '../../Types/EmailRecord';
 
+import { LoginResult } from '../../Types/LoginResult';
+import { RegistrationResult } from '../../Types/RegistrationResult';
+import { Message } from '../../Types/Message';
 
-interface PasswordServiceConfiguration {
+import { UserPasswordRegistration } from '../types/UserPasswordRegistration';
+import { HashAlgorithm } from '../types/HashAlgorithm';
+import { PasswordServiceConfiguration } from '../types/PasswordServiceConfiguration';
+import { UserPasswordLogin } from '../types/UserPasswordLogin';
+import { Password } from '../types/Password';
 
-  validation ?: {
-    username?: ( username: string ) => boolean | Promise <boolean>;
-    email?: ( username: string ) => boolean | Promise <boolean>;
-    password?: ( password: string ) => boolean | Promise <boolean>;
-  }
+import { merge, get } from 'lodash';
 
-
-
-}
+import { getFirstUserEmail } from '../utils/getFirstUserEmail';
+import { getHashPassword } from '../utils/hashPassword';
+import { getHashAndBcryptPassword } from '../utils/hashAndBcryptPassword';
+import { verifyPassword } from '../utils/verifyPassword';
 
 const defaultConfiguration: PasswordServiceConfiguration = {
   
@@ -31,8 +33,10 @@ const defaultConfiguration: PasswordServiceConfiguration = {
     username: () => true,
     email: () => true,
     password: () => true
-  }
+  },
 
+  passwordHashAlgorithm: 'sha256',
+  
 }
 
 
@@ -42,15 +46,26 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
   private config: PasswordServiceConfiguration;
 
-  private accountsServer: AccountServer;
+  private accountsServer: AccountsServer;
 
   private databaseInterface: DatabaseInterface;
 
   private tokenManager: TokenManager;
 
 
+  private hashPassword: ( password: Password ) => string;
+
+  private hashAndBcryptPassword: ( password: Password ) => Promise <string>;
+
+
   constructor( config?: PasswordServiceConfiguration ){
+
     this.config = merge({}, defaultConfiguration, config);
+
+    this.hashPassword = getHashPassword(this.config.passwordHashAlgorithm)
+
+    this.hashAndBcryptPassword = getHashAndBcryptPassword(this.hashPassword);
+
   }
 
 
@@ -61,7 +76,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const action: Function = this[actionName];
 
-    if(!action) throw new AccountsError(`[ Accounts - Password ] useService : No action matches ${actionName} `)
+    if(!action) throw new Error(`[ Accounts - Password ] useService : No action matches ${actionName} `)
     
     return action( params, connectionInfo )
 
@@ -149,15 +164,10 @@ export default class AuthenticationServicePassword implements AuthenticationServ
     const password: string = await this.hashAndBcryptPassword(newPassword);
 
     // Change the user password and remove the old token
-    await this.databaseInterface.setResetPassword(
-      dbUser.id,
-      resetTokenRecord.address,
-      password,
-      token
-    );
+    await this.databaseInterface.setResetPassword(dbUser.id, resetTokenRecord.address, password);
 
     // Changing the password should invalidate existing sessions
-    this.databaseInterface.invalidateAllSessions(dbUser.id);
+    await this.databaseInterface.invalidateAllSessions(dbUser.id);
 
     const message: Message = { message:'Password Changed' }
 
@@ -179,7 +189,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     if (!emails.find( ( e: EmailRecord ) => e.address === address )) throw new Error('No such email address for user');
 
-    const token: string = this.tokenManager.generateRandomToken();
+    const token: string = this.tokenManager.generateRandom();
 
     await this.databaseInterface.addEmailVerificationToken(dbUser.id, address, token);
 
@@ -203,7 +213,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const email = getFirstUserEmail(dbUser, address);
 
-    const token: string = this.tokenManager.generateRandomToken();
+    const token: string = this.tokenManager.generateRandom();
 
     await this.databaseInterface.addResetPasswordToken(dbUser.id, address, token);
 
@@ -217,7 +227,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
 
 
-  public authenticate = async ({ username, email, userId, password } : PasswordLogin, connectionInfo: ConnectionInformations) : Promise <LoginResult> => {
+  public authenticate = async ({ username, email, userId, password } : UserPasswordLogin, connectionInfo: ConnectionInformations) : Promise <LoginResult> => {
 
     if(!username && !email && !userId) throw new Error('Username, Email or userId is Required');
 
@@ -233,15 +243,13 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     if (!hash) throw new Error('User has no password set');
 
-    const hashedPassword: string = this.hashAlgorithm 
-      ? hashPassword(password, this.hashAlgorithm)
-      : password
+    const hashedPassword: string = this.hashPassword( password )
 
     const isPasswordValid: boolean = await verifyPassword(hashedPassword, hash)
 
     if (!isPasswordValid) throw new Error('Incorrect password');
 
-    const loginResult: LoginResult = this.accountsServer.loginWithUser(user, connectionInfo);
+    const loginResult: LoginResult = await this.accountsServer.loginWithUser(user, connectionInfo);
 
     return loginResult
   }

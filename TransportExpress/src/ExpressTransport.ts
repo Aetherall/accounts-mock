@@ -1,13 +1,17 @@
-import { ExpressTransportConfiguration } from './Types/ExpressTransportConfiguration';
-import { ConnectionInformations } from '../Types/ConnectionInformations';
-import { TokenTransport } from '../Types/TokenTransport';
-import { UserClean } from '../Types/UserClean';
+import { ConnectionInformations } from '../../Types/ConnectionInformations';
+import { TokenTransport } from '../../Types/TokenTransport';
+import { UserClean } from '../../Types/UserClean';
 
+import { ExpressTransportConfiguration } from '../types/ExpressTransportConfiguration';
 
+import AccountsServer from '../../AccountsServer/src/AccountsServer';
 
 import { Router } from 'express';
 
-import { getConnectionInfo } from './getConnectionInfos';
+import { getConnectionInfo } from '../utils/getConnectionInfos';
+import { ImpersonationResult } from '../../Types/ImpersonationResult';
+import { Tokens } from '../../Types/Tokens';
+import { LoginResult } from '../../Types/LoginResult';
 
 export default class ExpressTransport {
 
@@ -55,9 +59,9 @@ export default class ExpressTransport {
 		next();
   }
 
-  send = ( res: any, data: object = {} ) : void => {
+  send = ( res: any, data: any = {} ) : void => {
 
-    const toSend: object = res.toSend || {};
+    const toSend: any = res.toSend || {};
 
     res.json({ ...data, ...toSend })
   }
@@ -84,7 +88,7 @@ export default class ExpressTransport {
 
       const accessToken: string | null = this.tokenTransport.getAccessToken(req);
 
-      const user : Promise <UserClean> = await this.accountsServer.resumeSession(accessToken);
+      const user : UserClean = await this.accountsServer.resumeSession(accessToken);
 
       this.send(res, user)
   }
@@ -97,7 +101,7 @@ export default class ExpressTransport {
 
       const { tokens, user, sessionId } : LoginResult = await this.accountsServer.refreshTokens(requestTokens, connectionInfo);
 
-      this.tokenTransport.setToken(tokens, { req, res });
+      this.tokenTransport.setTokens(tokens, { req, res });
 
       this.send(res, { user, sessionId });
   }
@@ -114,15 +118,15 @@ export default class ExpressTransport {
 
   useService = async ( req: any, res: any ) : Promise <void> => {
     // Identify the service
-    const target: object = req.params;
+    const target: any = req.params;
 
     // Extract the action parameters
-    const params: object = req.body;
+    const params: any = req.body;
     
     // Extract the connection informations from the request
     const connectionInfo: ConnectionInformations = getConnectionInfo(req)
 
-    const { tokens, ...response } : object = await this.accountsServer.useService(target, params, connectionInfo);
+    const { tokens, ...response } : any = await this.accountsServer.useService(target, params, connectionInfo);
 
     if(tokens) this.tokenTransport.setTokens(tokens, { req, res });
 

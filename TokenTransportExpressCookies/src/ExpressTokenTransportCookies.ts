@@ -1,7 +1,8 @@
-import { TokenTransport } from '../Types/TokenTransport';
-import { ETTCConfiguration } from "./Types/ETTCConfiguration";
-import { ETTCTokenConfiguration } from "./Types/ETTCTokenConfiguration";
-import { Tokens } from "../Types/Tokens";
+import { TokenTransport } from "../../Types/TokenTransport";
+
+import { ETTCConfiguration} from "../types/ETTCConfiguration"
+import { ETTCTokenConfiguration} from "../types/ETTCTokenConfiguration"
+import { Tokens } from "../../Types/Tokens";
 
 const defaultConfig: ETTCConfiguration  = {
   access: {
