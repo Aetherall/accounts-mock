@@ -1,6 +1,11 @@
 import { User } from '../../Types/User';
 import { NotificationPlugin } from '../../Types/NotificationPlugin';
 import { NotificationPluginEmailPasswordConfiguration } from '../types/NotificationPluginEmailPasswordConfiguration';
+import { merge } from 'lodash';
+
+const defaultConfig: NotificationPluginEmailPasswordConfiguration = {
+  from: null
+}
 
 export default class NotificationPluginEmailPassword implements NotificationPlugin {
 
@@ -8,9 +13,9 @@ export default class NotificationPluginEmailPassword implements NotificationPlug
 
   private from: string | null;
 
-  constructor( config: NotificationPluginEmailPasswordConfiguration ){
-
-    this.from = config.from || null
+  constructor( config?: NotificationPluginEmailPasswordConfiguration ){
+    const configuration = merge({}, defaultConfig, config);
+    this.from = configuration.from;
 
   }
 

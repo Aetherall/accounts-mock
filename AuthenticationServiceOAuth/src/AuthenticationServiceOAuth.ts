@@ -7,6 +7,8 @@ import { AuthenticationServiceOAuthConfiguration } from "../types/Authentication
 import { ConnectionInformations } from "../../Types/ConnectionInformations";
 import { User } from '../../Types/User';
 
+import { forEach } from 'lodash';
+
 export default class AuthenticationServiceOAuth implements AuthenticationService {
   
   public name: string = 'oauth';
@@ -23,6 +25,18 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
       ( a: AuthenticationProvidersOAuth, authenticationProvider: AuthenticationProviderOAuth ) =>
       a[authenticationProvider.name] = authenticationProvider
     ,{})
+
+  }
+
+  link = ( accountsServer: AccountsServer ) : this => {
+
+    this.accountsServer = accountsServer;
+
+    this.databaseInterface = accountsServer.databaseInterface;
+
+    //forEach( this.authenticationProviders, ( authenticationProvider: AuthenticationProviderOAuth, name: string ) => authenticationProvider );
+
+    return this;
 
   }
 

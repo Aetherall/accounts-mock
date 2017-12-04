@@ -1,19 +1,22 @@
-import NotificationPluginEmailPassword from './NotificationPluginEmailPassword/src/NotificationPluginEmailPassword';
-import NotificationServiceMailgun from './NotificationServiceMailgun/src/NotificationServiceMailgun';
 import Mongo from 'mongodb'
-
-import AccountsServer from "./AccountsServer/src/AccountsServer";
-import MongoInterface from './MongoInterface/src/MongoInterface';
-import AuthenticationServicePassword from './AuthenticationServicePassword/src/AuthenticationServicePassword';
-import TokenManager from './TokenManager/src/TokenManager';
-import AuthenticationServiceOAuth from './AuthenticationServiceOAuth/src/AuthenticationServiceOAuth';
+import AccountsServer, { 
+  MongoInterface, 
+  PasswordService, 
+  OAuthFacebook, 
+  OAuthService, 
+  TokenTransportExpressBody, 
+  TransportExpress, 
+  NotificationPluginEmailPassword, 
+  NotificationServiceMailgun, 
+  NotificationServiceDebug, 
+  TokenManager } from './index';
 
 
 const db = new Mongo('');
 
 const databaseInterface = new MongoInterface(db,{})
 
-const passwordService = new AuthenticationServicePassword({
+const passwordService = new PasswordService({
 
   validation:{
 
@@ -25,13 +28,32 @@ const passwordService = new AuthenticationServicePassword({
   
 })
 
-const facebookProvider = new FacebookProvider()
+const facebookProvider = new OAuthFacebook()
 
-const twitterProvider = new TwitterProvider()
+//const twitterProvider = new TwitterProvider()
 
-const oauthService = new OAuthService(facebookProvider, twitterProvider)
+const oauthService = new OAuthService({
 
+  authenticationProviders: [ facebookProvider ]
 
+})
+
+const tokenTransport = new TokenTransportExpressBody(
+  {
+    access:{
+      name: 'accessToken',
+      canStore: () => true
+    },
+    refresh:{
+      name: 'refreshToken',
+      canStore: () => true
+    }
+  }
+)
+
+const transport = new TransportExpress({
+  tokenTransport: tokenTransport
+})
 
 
 const passwordEmails = new NotificationPluginEmailPassword({})
@@ -52,5 +74,6 @@ const accountsServer = new AccountsServer({
   databaseInterface,
   tokenManager,
   authenticationServices: [ passwordService, oauthService ],
+  transport,
   notificationServices: [ emailService ]
 })

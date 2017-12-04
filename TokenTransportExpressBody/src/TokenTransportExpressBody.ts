@@ -2,6 +2,7 @@ import { ETTBConfiguration } from "../types/ETTBConfiguration";
 import { TokenTransport } from "../../Types/TokenTransport";
 import { ETTBTokenConfiguration } from "../types/ETTBTokenConfiguration";
 import { Tokens } from "../../Types/Tokens";
+import { merge } from "lodash";
 
 
 
@@ -22,10 +23,11 @@ export default class ExpressTokenTransportBody implements TokenTransport {
   public refreshConfig: ETTBTokenConfiguration;
 
   constructor( config: ETTBConfiguration ) {
+    const configuration = merge({}, defaultConfig, config)
+    
+    this.accessConfig = configuration.access;
 
-    this.accessConfig = { ...defaultConfig.access, ...config.access };
-
-    this.refreshConfig = { ...defaultConfig.refresh, ...config.refresh };
+    this.refreshConfig = configuration.refresh
 
   }
 

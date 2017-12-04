@@ -12,6 +12,6 @@ export interface PasswordServiceConfiguration {
 
     }
 
-    passwordHashAlgorithm: HashAlgorithm;
+    passwordHashAlgorithm?: HashAlgorithm;
   
 }

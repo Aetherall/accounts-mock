@@ -1,6 +1,6 @@
 import { HashAlgorithm } from "../types/HashAlgorithm";
 import { Password } from "../types/Password";
-;
+
 import { bcryptPassword } from "./bcryptPassword";
 
 

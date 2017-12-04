@@ -46,6 +46,8 @@ export default class MongoInterface implements DatabaseInterface {
     // await to resolve connection to database
     this.db = await db;
 
+    console.log(this.db.Db);
+
     this.userCollection = db.collection(this.config.userCollectionName);
 
     this.sessionCollection = db.collection(this.config.sessionCollectionName);

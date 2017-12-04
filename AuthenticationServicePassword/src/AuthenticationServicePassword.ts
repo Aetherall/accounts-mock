@@ -1,8 +1,8 @@
-import TokenManager from '../../TokenManager/src/TokenManager';
 import AccountsServer from '../../AccountsServer/src/AccountsServer';
 
 import { AuthenticationService } from '../../Types/AuthenticationService';
 import { DatabaseInterface } from '../../Types/DatabaseInterface';
+import { TokenManagerInterface } from '../../TokenManager/types/TokenManagerInterface';
 
 import { ConnectionInformations } from '../../Types/ConnectionInformations';
 
@@ -27,6 +27,7 @@ import { getHashPassword } from '../utils/hashPassword';
 import { getHashAndBcryptPassword } from '../utils/hashAndBcryptPassword';
 import { verifyPassword } from '../utils/verifyPassword';
 
+
 const defaultConfiguration: PasswordServiceConfiguration = {
   
   validation: {
@@ -46,11 +47,11 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
   private config: PasswordServiceConfiguration;
 
-  private accountsServer: AccountsServer;
+  public accountsServer: AccountsServer;
 
-  private databaseInterface: DatabaseInterface;
+  public databaseInterface: DatabaseInterface;
 
-  private tokenManager: TokenManager;
+  public tokenManager: TokenManagerInterface;
 
 
   private hashPassword: ( password: Password ) => string;
@@ -66,6 +67,18 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     this.hashAndBcryptPassword = getHashAndBcryptPassword(this.hashPassword);
 
+  }
+
+  link = ( accountsServer: AccountsServer ) : this => {
+    
+    this.accountsServer = accountsServer;
+    
+    this.databaseInterface = this.accountsServer.databaseInterface;
+
+    this.tokenManager = this.accountsServer.tokenManager;
+        
+    return this;
+    
   }
 
 
@@ -153,7 +166,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const resetTokenRecord: TokenRecord = resetTokens.find(( t: TokenRecord ) => t.token === token )
 
-    if (this.server.isTokenExpired(token, resetTokenRecord)) {
+    if (this.accountsServer.tokenManager.isTokenExpired(token, resetTokenRecord)) {
       throw new Error('Reset password link expired');
     }
 

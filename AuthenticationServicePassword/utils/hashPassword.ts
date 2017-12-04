@@ -1,6 +1,6 @@
 import { Password } from '../types/Password';
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 
 export const getHashPassword = ( algorithm: string ) => ( password: Password ) => {

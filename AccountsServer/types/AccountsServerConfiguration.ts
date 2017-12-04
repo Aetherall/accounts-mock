@@ -15,11 +15,13 @@ export interface AccountsServerConfiguration {
 
   databaseInterface: DatabaseInterface;
 
+  tokenManager: TokenManager;
+
+  transport: any;
+
   authenticationServices: AuthenticationService[];
 
   notificationServices: NotificationService[];
-
-  tokenManager: TokenManager;
 
   impersonationAuthorize?: ImpersonationAuthorize;
 

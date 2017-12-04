@@ -20,9 +20,11 @@ import { TokenPayload } from "../../Types/TokenPayload";
 
 export default class AccountsServer {
   
-  private databaseInterface: DatabaseInterface;
+  public databaseInterface: DatabaseInterface;
   
-	private tokenManager: TokenManagerInterface;
+	public tokenManager: TokenManagerInterface;
+
+	public transport: any;
 
 	private authenticationServices: AuthenticationServices;
 	
@@ -43,6 +45,8 @@ export default class AccountsServer {
 
 		this.databaseInterface = config.databaseInterface;
 		this.tokenManager = config.tokenManager;
+
+		this.transport = config.transport.link(this)
 
 		this.authenticationServices = config.authenticationServices.reduce(
       ( a: AuthenticationServices, authenticationService: AuthenticationService ) =>
@@ -258,7 +262,10 @@ export default class AccountsServer {
 
 	}
 
-	sanitizeUser = ( user: User ) : UserSafe => omit(user, ['services']);
+	sanitizeUser = ( user: User ) : UserSafe => {
+		const { services, ...usersafe } = user;
+		return usersafe
+	}
   
       
   

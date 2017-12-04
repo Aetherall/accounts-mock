@@ -1,5 +1,6 @@
 import { RefreshTokenPayload } from "../../Types/RefreshTokenPayload";
 import { TokenPayload } from "../../Types/TokenPayload";
+import { TokenRecord } from "../../Types/TokenRecord";
 
 
 export interface TokenManagerInterface {
@@ -8,7 +9,9 @@ export interface TokenManagerInterface {
 
   generateRefresh({ sessionId, isImpersonated} ?: { sessionId?: string, isImpersonated?: boolean }) : string;
 
-  generateRandom( length: number ) : string;
+  generateRandom( length?: number ) : string;
+
+  isTokenExpired( token: string, tokenRecord?: TokenRecord ): boolean
 
   decode( token: string, ignoreExpiration?: boolean) : Promise <TokenPayload>;
   

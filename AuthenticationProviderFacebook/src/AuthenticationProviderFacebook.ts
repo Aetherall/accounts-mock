@@ -1,15 +1,15 @@
 import { AuthenticationProviderOAuth } from '../../Types/AuthenticationProviderOAuth';
 
-import requestPromise from 'request-promise';
+import * as requestPromise from 'request-promise';
 
-class AuthenticationProviderOAuthFacebook implements AuthenticationProviderOAuth {
+export default class AuthenticationProviderOAuthFacebook implements AuthenticationProviderOAuth {
 
   public name: string = 'facebook';
 
   constructor(){
 
   }
-  
+
   authenticate = async (params) => {
     if (!params.access_token) {
       throw new Error('No access token provided');

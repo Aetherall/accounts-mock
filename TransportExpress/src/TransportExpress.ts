@@ -13,7 +13,7 @@ import { ImpersonationResult } from '../../Types/ImpersonationResult';
 import { Tokens } from '../../Types/Tokens';
 import { LoginResult } from '../../Types/LoginResult';
 
-export default class ExpressTransport {
+export default class TransportExpress {
 
   private accountsServer: AccountsServer;
 
@@ -40,6 +40,14 @@ export default class ExpressTransport {
       .post(`${this.path}/logout`, this.logout)
       .post(`${this.path}/:service/:provider?/:action`, this.useService)
 
+  }
+
+  link = ( accountsServer: AccountsServer ) : this => {
+    
+    this.accountsServer = accountsServer;
+        
+    return this;
+    
   }
 
   // middleware
