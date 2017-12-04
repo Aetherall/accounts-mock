@@ -1,7 +1,7 @@
 import mailgun from 'mailgun-js';
-import { NotificationService } from '../../Types/NotificationService';
-import { NotificationPlugins } from '../../Types/NotificationPlugin';
-import { NotificationServiceMailgunConfiguration } from '../types/NotificationServiceMailgunConfiguration';
+import { NotificationService, NotificationPlugin, NotificationPlugins } from '@types/accounts';
+
+import { NotificationServiceMailgunConfiguration } from './types/NotificationServiceMailgunConfiguration';
 
 export default class NotificationServiceMailgun implements NotificationService {
 
@@ -22,7 +22,7 @@ export default class NotificationServiceMailgun implements NotificationService {
     this.mailgun = config.mailgun || mailgun({ apiKey: config.apiKey, domain: config.domain });
 
     this.notificationPlugins = config.notificationPlugins.reduce(
-      (a, notificationPlugin) => a[notificationPlugin.name] = notificationPlugin
+      ( a: NotificationPlugins , notificationPlugin: NotificationPlugin ) => a[notificationPlugin.name] = notificationPlugin
     ,{})
 
   }

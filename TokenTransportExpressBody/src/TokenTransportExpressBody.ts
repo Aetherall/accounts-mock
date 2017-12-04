@@ -1,12 +1,14 @@
-import { ETTBConfiguration } from "../types/ETTBConfiguration";
-import { TokenTransport } from "../../Types/TokenTransport";
-import { ETTBTokenConfiguration } from "../types/ETTBTokenConfiguration";
-import { Tokens } from "../../Types/Tokens";
+import { TokenTransport, Tokens } from '@types/accounts';
+
+import { Configuration } from "./types/Configuration";
+import { TokenConfiguration } from "./types/TokenConfiguration";
+
+
 import { merge } from "lodash";
 
 
 
-const defaultConfig: ETTBConfiguration = {
+const defaultConfig: Configuration = {
   access: {
     name: 'accessToken',
     canStore: () => true
@@ -17,12 +19,12 @@ const defaultConfig: ETTBConfiguration = {
   }
 }
 
-export default class ExpressTokenTransportBody implements TokenTransport {
+export default class TokenTransportExpressBody implements TokenTransport {
 
-  public accessConfig: ETTBTokenConfiguration;
-  public refreshConfig: ETTBTokenConfiguration;
+  public accessConfig: TokenConfiguration;
+  public refreshConfig: TokenConfiguration;
 
-  constructor( config: ETTBConfiguration ) {
+  constructor( config: Configuration ) {
     const configuration = merge({}, defaultConfig, config)
     
     this.accessConfig = configuration.access;

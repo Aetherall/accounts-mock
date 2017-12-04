@@ -1,11 +1,16 @@
-import { LoginResult } from '../../Types/LoginResult';
-import { AuthenticationService } from "../../Types/AuthenticationService";
-import AccountsServer from "../../AccountsServer/src/AccountsServer";
-import { DatabaseInterface } from "../../Types/DatabaseInterface";
-import { AuthenticationProvidersOAuth, AuthenticationProviderOAuth } from "../../Types/AuthenticationProviderOAuth";
-import { AuthenticationServiceOAuthConfiguration } from "../types/AuthenticationServiceOAuthConfiguration";
-import { ConnectionInformations } from "../../Types/ConnectionInformations";
-import { User } from '../../Types/User';
+import { 
+  LoginResult, 
+  AuthenticationService, 
+  DatabaseInterface, 
+  AuthenticationProvidersOAuth, 
+  AuthenticationProviderOAuth,
+  ConnectionInformations,
+  User
+} from '@types/accounts';
+
+import AccountsServer from '@accounts/server';
+
+import { AuthenticationServiceOAuthConfiguration } from "./types/AuthenticationServiceOAuthConfiguration";
 
 import { forEach } from 'lodash';
 

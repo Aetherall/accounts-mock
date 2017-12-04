@@ -1,11 +1,10 @@
-import { DatabaseInterface } from '../../Types/DatabaseInterface';
-import { MongoInterfaceConfiguration } from '../types/MongoInterfaceConfiguration';
+import { DatabaseInterface, User, Session, ConnectionInformations } from '@types/accounts';
+
+import { MongoInterfaceConfiguration } from './types/MongoInterfaceConfiguration';
 
 import { get, merge } from 'lodash';
-import { toMongoID } from '../utils/toMongoId';
-import { User } from '../../Types/User';
-import { Session } from '../../Types/Session';
-import { ConnectionInformations } from '../../Types/ConnectionInformations';
+import { toMongoID } from './utils/toMongoId';
+
 
 const defaultConfiguration: MongoInterfaceConfiguration = {
   userCollectionName: 'users',

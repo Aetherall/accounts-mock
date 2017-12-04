@@ -1,8 +1,7 @@
-import { TokenTransport } from "../../Types/TokenTransport";
-import { Tokens } from "../../Types/Tokens";
+import { TokenTransport, Tokens } from '@types/accounts';
 
-import { ETTHConfiguration } from "../types/ETTHConfiguration";
-import { ETTHTokenConfiguration } from "../types/ETTHTokenConfiguration";
+import { Configuration } from "./types/Configuration";
+import { TokenConfiguration } from "./types/TokenConfiguration";
 
 
 const defaultConfig = {
@@ -17,12 +16,12 @@ const defaultConfig = {
 }
 
 
-export default class ExpressTokenTransportHeaders implements TokenTransport {
+export default class TokenTransportExpressHeaders implements TokenTransport {
 
-  public accessConfig: ETTHTokenConfiguration;
-  public refreshConfig: ETTHTokenConfiguration;
+  public accessConfig: TokenConfiguration;
+  public refreshConfig: TokenConfiguration;
 
-  constructor( config: ETTHConfiguration ) {
+  constructor( config: Configuration ) {
 
     this.accessConfig = { ...defaultConfig.access, ...config.access };
 

@@ -2,10 +2,18 @@
   "name": "@accounts/express",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsc --watch",
+    "clean": "rimraf lib",
+    "precompile": "npm run clean",
+    "compile": "tsc",
+    "prepublish": "npm run compile"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/accounts": "^1.0.0"
+  }
 }

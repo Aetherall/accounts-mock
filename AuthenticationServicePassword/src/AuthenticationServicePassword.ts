@@ -1,31 +1,32 @@
-import AccountsServer from '../../AccountsServer/src/AccountsServer';
+import AccountsServer from '@accounts/server';
 
-import { AuthenticationService } from '../../Types/AuthenticationService';
-import { DatabaseInterface } from '../../Types/DatabaseInterface';
-import { TokenManagerInterface } from '../../TokenManager/types/TokenManagerInterface';
+import { 
+  AuthenticationService, 
+  DatabaseInterface,
+  ConnectionInformations,
+  User,
+  TokenRecord,
+  EmailRecord,
+  LoginResult,
+  RegistrationResult,
+  Message,
 
-import { ConnectionInformations } from '../../Types/ConnectionInformations';
+} from '@types/accounts';
 
-import { User } from '../../Types/User';
-import { TokenRecord } from '../../Types/TokenRecord';
-import { EmailRecord } from '../../Types/EmailRecord';
+import { TokenManagerInterface } from '@accounts/token';
 
-import { LoginResult } from '../../Types/LoginResult';
-import { RegistrationResult } from '../../Types/RegistrationResult';
-import { Message } from '../../Types/Message';
-
-import { UserPasswordRegistration } from '../types/UserPasswordRegistration';
-import { HashAlgorithm } from '../types/HashAlgorithm';
-import { PasswordServiceConfiguration } from '../types/PasswordServiceConfiguration';
-import { UserPasswordLogin } from '../types/UserPasswordLogin';
-import { Password } from '../types/Password';
+import { UserPasswordRegistration } from './types/UserPasswordRegistration';
+import { HashAlgorithm } from './types/HashAlgorithm';
+import { PasswordServiceConfiguration } from './types/PasswordServiceConfiguration';
+import { UserPasswordLogin } from './types/UserPasswordLogin';
+import { Password } from './types/Password';
 
 import { merge, get } from 'lodash';
 
-import { getFirstUserEmail } from '../utils/getFirstUserEmail';
-import { getHashPassword } from '../utils/hashPassword';
-import { getHashAndBcryptPassword } from '../utils/hashAndBcryptPassword';
-import { verifyPassword } from '../utils/verifyPassword';
+import { getFirstUserEmail } from './utils/getFirstUserEmail';
+import { getHashPassword } from './utils/hashPassword';
+import { getHashAndBcryptPassword } from './utils/hashAndBcryptPassword';
+import { verifyPassword } from './utils/verifyPassword';
 
 
 const defaultConfiguration: PasswordServiceConfiguration = {

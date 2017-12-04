@@ -1,6 +1,6 @@
-import { NotificationService } from '../../Types/NotificationService';
-import { NotificationPlugins, NotificationPlugin } from '../../Types/NotificationPlugin';
-import { NotificationServiceDebugConfiguration } from '../types/NotificationServiceDebugConfiguration';
+import { NotificationService, NotificationPlugin, NotificationPlugins } from '@types/accounts';
+
+import { NotificationServiceDebugConfiguration } from './types/NotificationServiceDebugConfiguration';
 
 export default class NotificationServiceDebug implements NotificationService {
 

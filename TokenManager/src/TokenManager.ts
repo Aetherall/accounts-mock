@@ -1,10 +1,8 @@
-import { TokenPayload } from '../../Types/TokenPayload';
-import { RefreshTokenPayload } from '../../Types/RefreshTokenPayload';
-import { TokenRecord } from '../../Types/TokenRecord';
+import { TokenPayload, RefreshTokenPayload, TokenRecord } from '@types/accounts';
 
-import { TokenGenerationConfiguration } from '../types/TokenGenerationConfiguration';
-import { TokenManagerConfiguration } from '../types/TokenManagerConfiguration';
-import { TokenManagerInterface } from '../types/TokenManagerInterface';
+import { TokenGenerationConfiguration } from './types/TokenGenerationConfiguration';
+import { TokenManagerConfiguration } from './types/TokenManagerConfiguration';
+import { TokenManagerInterface } from './types/TokenManagerInterface';
 
 import jwt from 'jsonwebtoken';
 import { randomBytes } from 'crypto';

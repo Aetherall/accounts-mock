@@ -1,10 +1,9 @@
-import { TokenTransport } from "../../Types/TokenTransport";
+import { TokenTransport, Tokens } from '@types/accounts';
 
-import { ETTCConfiguration} from "../types/ETTCConfiguration"
-import { ETTCTokenConfiguration} from "../types/ETTCTokenConfiguration"
-import { Tokens } from "../../Types/Tokens";
+import { Configuration } from "./types/Configuration"
+import { TokenConfiguration } from "./types/TokenConfiguration"
 
-const defaultConfig: ETTCConfiguration  = {
+const defaultConfig: Configuration  = {
   access: {
     name: 'accessToken',
     canStore: () => true,
@@ -29,12 +28,12 @@ const defaultConfig: ETTCConfiguration  = {
   }
 }
 
-export default class ExpressTokenTransportCookies implements TokenTransport {
+export default class TokenTransportExpressCookies implements TokenTransport {
 
-  public accessConfig: ETTCTokenConfiguration;
-  public refreshConfig: ETTCTokenConfiguration;
+  public accessConfig: TokenConfiguration;
+  public refreshConfig: TokenConfiguration;
 
-  constructor( config: ETTCConfiguration ) {
+  constructor( config: Configuration ) {
 
     this.accessConfig = { ...defaultConfig.access, ...config.access }
 

@@ -1,21 +1,25 @@
-import { AccountsServerConfiguration, ImpersonationAuthorize, ResumeSessionValidator } from "../types/AccountsServerConfiguration";
+import { 
+	AuthenticationServices, 
+	AuthenticationService,
+	TokenManagerInterface,
+	DatabaseInterface,
+	ConnectionInformations,
+	User,
+	UserSafe,
+	Session,
+	Tokens,
+	LoginResult,
+	ImpersonationResult,
+	NotificationServices,
+	NotificationService,
+	TokenPayload
+} from '@types/accounts';
 
-import { AuthenticationServices, AuthenticationService } from "../../Types/AuthenticationService";
+import { AccountsServerConfiguration, ImpersonationAuthorize, ResumeSessionValidator } from "./types/AccountsServerConfiguration";
 
-import { TokenManagerInterface } from "../../TokenManager/types/TokenManagerInterface";
-import { DatabaseInterface } from "../../Types/DatabaseInterface";
-
-import { ConnectionInformations } from "../../Types/ConnectionInformations";
-import { User } from "../../Types/User";
-import { Session } from "../../Types/Session";
-import { UserSafe } from "../../Types/UserSafe";
-import { Tokens } from "../../Types/Tokens";
-import { LoginResult } from "../../Types/LoginResult";
-import { ImpersonationResult } from "../../Types/ImpersonationResult";
-import { NotificationServices, NotificationService } from "../../Types/NotificationService";
 
 import { omit } from 'lodash';
-import { TokenPayload } from "../../Types/TokenPayload";
+
 
 
 export default class AccountsServer {
