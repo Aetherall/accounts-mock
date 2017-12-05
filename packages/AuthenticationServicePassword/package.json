@@ -14,6 +14,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/accounts": "^1.0.0"
+    "@accounts/server": "^1.0.0",
+    "@accounts/token": "^1.0.0",
+    "@types/accounts": "^1.0.0",
+    "@types/node": "^8.0.54"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
   }
 }

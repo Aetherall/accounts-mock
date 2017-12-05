@@ -1,4 +1,4 @@
-import { ConnectionInformations, TokenTransport, UserSafe, ImpersonationResult, Tokens, LoginResult } from '@types/accounts';
+import { ConnectionInformations, TokenTransport, UserSafe, ImpersonationResult, Tokens, LoginResult } from 'accounts';
 
 import { ExpressTransportConfiguration } from './types/ExpressTransportConfiguration';
 
@@ -6,7 +6,7 @@ import AccountsServer from '@accounts/server';
 
 import { Router } from 'express';
 
-import { getConnectionInfo } from '../utils/getConnectionInfos';
+import { getConnectionInfo } from './utils/getConnectionInfos';
 
 export default class TransportExpress {
 

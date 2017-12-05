@@ -2,11 +2,11 @@ import {
   LoginResult, 
   AuthenticationService, 
   DatabaseInterface, 
-  AuthenticationProvidersOAuth, 
-  AuthenticationProviderOAuth,
+  AuthenticationOAuthProviders, 
+  AuthenticationOAuthProvider,
   ConnectionInformations,
   User
-} from '@types/accounts';
+} from 'accounts';
 
 import AccountsServer from '@accounts/server';
 
@@ -22,12 +22,12 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
 
   private databaseInterface: DatabaseInterface;
 
-  private authenticationProviders: AuthenticationProvidersOAuth;
+  private authenticationProviders: AuthenticationOAuthProviders;
 
   constructor(config: AuthenticationServiceOAuthConfiguration) {
 
     this.authenticationProviders = config.authenticationProviders.reduce(
-      ( a: AuthenticationProvidersOAuth, authenticationProvider: AuthenticationProviderOAuth ) =>
+      ( a: AuthenticationOAuthProviders, authenticationProvider: AuthenticationOAuthProvider ) =>
       a[authenticationProvider.name] = authenticationProvider
     ,{})
 
@@ -49,7 +49,7 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
 
     const providerName: string = target.provider;
     
-    const provider: AuthenticationProviderOAuth = this.authenticationProviders[providerName];
+    const provider: AuthenticationOAuthProvider = this.authenticationProviders[providerName];
     
     if(!provider) throw new Error(`[ Accounts - OAuth ] useService : No provider matches ${providerName} `)
     
@@ -66,7 +66,7 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
     return providerAction( params, connectionInfo )
   }
 
-  public authenticate = async ( provider: AuthenticationProviderOAuth , params, connectionInfo: ConnectionInformations ) : Promise <LoginResult> => {
+  public authenticate = async ( provider: AuthenticationOAuthProvider , params, connectionInfo: ConnectionInformations ) : Promise <LoginResult> => {
 
     const oauthUser: any = await provider.authenticate(params)
 

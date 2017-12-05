@@ -1,5 +1,7 @@
-import { AuthenticationProviderOAuth } from "@types/accounts";
+import { AuthenticationOAuthProvider } from 'accounts';
 
 export interface AuthenticationServiceOAuthConfiguration {
-  authenticationProviders: AuthenticationProviderOAuth[]
+
+  authenticationProviders: AuthenticationOAuthProvider[]
+  
 }

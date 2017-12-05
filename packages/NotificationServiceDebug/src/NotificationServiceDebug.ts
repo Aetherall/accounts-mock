@@ -1,4 +1,4 @@
-import { NotificationService, NotificationPlugin, NotificationPlugins } from '@types/accounts';
+import { NotificationService, NotificationPlugin, NotificationPlugins } from 'accounts';
 
 import { NotificationServiceDebugConfiguration } from './types/NotificationServiceDebugConfiguration';
 

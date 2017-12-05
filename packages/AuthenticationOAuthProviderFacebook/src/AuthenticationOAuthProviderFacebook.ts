@@ -1,4 +1,4 @@
-import { AuthenticationOAuthProvider } from '@types/accounts';
+import { AuthenticationOAuthProvider } from 'accounts';
 
 import * as requestPromise from 'request-promise';
 

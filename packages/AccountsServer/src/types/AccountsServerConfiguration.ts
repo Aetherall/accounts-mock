@@ -1,12 +1,11 @@
 import { 
-  DatabaseInterface, 
+  DatabaseInterface,
+  TokenManagerInterface,
   AuthenticationService,
   User,
   Session,
   NotificationService
-} from '@types/accounts';
-
-import TokenManager from '@accounts/token';
+} from 'accounts';
 
 
 export type ImpersonationAuthorize = ( user: User, impersonateToUser: User ) => Promise <any>;
@@ -19,7 +18,7 @@ export interface AccountsServerConfiguration {
 
   databaseInterface: DatabaseInterface;
 
-  tokenManager: TokenManager;
+  tokenManager: TokenManagerInterface;
 
   transport: any;
 

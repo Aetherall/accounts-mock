@@ -1,7 +1,6 @@
 import { 
 	AuthenticationServices, 
 	AuthenticationService,
-	TokenManagerInterface,
 	DatabaseInterface,
 	ConnectionInformations,
 	User,
@@ -12,8 +11,9 @@ import {
 	ImpersonationResult,
 	NotificationServices,
 	NotificationService,
-	TokenPayload
-} from '@types/accounts';
+	TokenPayload,
+	TokenManagerInterface
+} from 'accounts';
 
 import { AccountsServerConfiguration, ImpersonationAuthorize, ResumeSessionValidator } from "./types/AccountsServerConfiguration";
 

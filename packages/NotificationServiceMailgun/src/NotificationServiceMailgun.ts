@@ -1,5 +1,5 @@
 import mailgun from 'mailgun-js';
-import { NotificationService, NotificationPlugin, NotificationPlugins } from '@types/accounts';
+import { NotificationService, NotificationPlugin, NotificationPlugins } from 'accounts';
 
 import { NotificationServiceMailgunConfiguration } from './types/NotificationServiceMailgunConfiguration';
 

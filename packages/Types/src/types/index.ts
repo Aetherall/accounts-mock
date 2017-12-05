@@ -1,5 +1,5 @@
 export * from "./AccessTokenPayload";
-export * from "./AuthenticationProviderOAuth";
+export * from "./AuthenticationOAuthProvider";
 export * from "./AuthenticationService";
 export * from "./ConnectionInformations";
 export * from "./DatabaseInterface";
@@ -15,6 +15,7 @@ export * from "./Session";
 export * from "./TokenPayload";
 export * from "./TokenRecord";
 export * from "./TokenTransport";
+export * from "./TokenManagerInterface";
 export * from "./Tokens";
 export * from "./User";
 export * from "./UserSafe";

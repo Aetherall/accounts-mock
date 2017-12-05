@@ -1,4 +1,4 @@
-import { TokenTransport } from "@types/accounts";
+import { TokenTransport } from 'accounts';
 
 import AccountsServer from "@accounts/server";
 

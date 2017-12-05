@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "types": "lib/index.d.ts",
   "scripts": {
     "start": "tsc --watch",
     "clean": "rimraf lib",
@@ -12,5 +12,8 @@
     "prepublish": "npm run compile"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^8.0.54"
+  }
 }

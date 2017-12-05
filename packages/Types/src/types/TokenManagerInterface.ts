@@ -1,4 +1,5 @@
-import { TokenPayload, TokenRecord } from '@types/accounts';
+import { TokenRecord } from './TokenRecord';
+import { TokenPayload } from './TokenPayload';
 
 
 export interface TokenManagerInterface {

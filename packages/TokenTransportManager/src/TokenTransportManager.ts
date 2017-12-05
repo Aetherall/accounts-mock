@@ -1,4 +1,4 @@
-import { TokenTransport,Tokens } from "@types/accounts";
+import { TokenTransport,Tokens } from 'accounts';
 
 export default class TokenTransportManager implements TokenTransport {
   

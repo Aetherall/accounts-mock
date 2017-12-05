@@ -1,19 +1,19 @@
-import { User, NotificationPlugin } from '@types/accounts';
+import { User, NotificationPlugin } from 'accounts';
 
-import { NotificationEmailPluginPasswordConfiguration } from './types/NotificationEmailPluginPasswordConfiguration';
+import { NotificationPluginEmailPasswordConfiguration } from './types/NotificationPluginEmailPasswordConfiguration';
 import { merge } from 'lodash';
 
-const defaultConfig: NotificationEmailPluginPasswordConfiguration = {
+const defaultConfig: NotificationPluginEmailPasswordConfiguration = {
   from: null
 }
 
-export default class NotificationEmailPluginPassword implements NotificationPlugin {
+export default class NotificationPluginEmailPassword implements NotificationPlugin {
 
   public name: string = 'password';
 
   private from: string | null;
 
-  constructor( config?: NotificationEmailPluginPasswordConfiguration ){
+  constructor( config?: NotificationPluginEmailPasswordConfiguration ){
     const configuration = merge({}, defaultConfig, config);
     this.from = configuration.from;
 

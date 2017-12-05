@@ -1,4 +1,4 @@
-import { TokenTransport, Tokens } from '@types/accounts';
+import { TokenTransport, Tokens } from 'accounts';
 
 import { Configuration } from "./types/Configuration"
 import { TokenConfiguration } from "./types/TokenConfiguration"

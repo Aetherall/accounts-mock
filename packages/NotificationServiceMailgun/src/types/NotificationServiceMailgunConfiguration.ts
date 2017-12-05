@@ -1,4 +1,4 @@
-import { NotificationPlugin } from '@types/accounts';
+import { NotificationPlugin } from 'accounts';
 
 export interface NotificationServiceMailgunConfiguration {
   

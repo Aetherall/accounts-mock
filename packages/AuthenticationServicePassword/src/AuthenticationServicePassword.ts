@@ -10,10 +10,8 @@ import {
   LoginResult,
   RegistrationResult,
   Message,
-
-} from '@types/accounts';
-
-import { TokenManagerInterface } from '@accounts/token';
+  TokenManagerInterface
+} from 'accounts';
 
 import { UserPasswordRegistration } from './types/UserPasswordRegistration';
 import { HashAlgorithm } from './types/HashAlgorithm';

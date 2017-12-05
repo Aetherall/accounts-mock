@@ -1,8 +1,7 @@
-import { TokenPayload, RefreshTokenPayload, TokenRecord } from '@types/accounts';
+import { TokenPayload, RefreshTokenPayload, TokenRecord, TokenManagerInterface } from 'accounts';
 
 import { TokenGenerationConfiguration } from './types/TokenGenerationConfiguration';
 import { TokenManagerConfiguration } from './types/TokenManagerConfiguration';
-import { TokenManagerInterface } from './types/TokenManagerInterface';
 
 import jwt from 'jsonwebtoken';
 import { randomBytes } from 'crypto';

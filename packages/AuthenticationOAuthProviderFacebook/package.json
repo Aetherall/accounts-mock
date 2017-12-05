@@ -13,7 +13,11 @@
   },
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "request-promise": "^4.2.2"
+  },
   "devDependencies": {
-    "@types/accounts": "^1.0.0"
+    "@types/accounts": "^1.0.0",
+    "@types/node": "^8.0.54"
   }
 }

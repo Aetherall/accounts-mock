@@ -1,4 +1,4 @@
-import { DatabaseInterface, User, Session, ConnectionInformations } from '@types/accounts';
+import { DatabaseInterface, User, Session, ConnectionInformations } from 'accounts';
 
 import { MongoInterfaceConfiguration } from './types/MongoInterfaceConfiguration';
 
