@@ -8,9 +8,9 @@
     "start": "tsc --watch",
     "clean": "rimraf lib",
     "clean_": "rimraf node_modules",
-    "precompile": "npm run clean",
+    "precompile": "yarn run clean",
     "compile": "tsc",
-    "prepublish": "npm run compile"
+    "prepublish": "yarn run compile"
   },
   "author": "Elies Lou",
   "license": "MIT",

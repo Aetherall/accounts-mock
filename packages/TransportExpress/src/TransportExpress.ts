@@ -14,7 +14,7 @@ export default class TransportExpress {
 
   private tokenTransport: TokenTransport;
 
-	private router: any;
+	public router: any;
 	
 	private path: string;
 	

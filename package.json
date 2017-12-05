@@ -1,14 +1,16 @@
 {
 	"private": true,
 	"name": "@accounts/workbench",
-	"scripts":{
+	"scripts": {
 		"i": "lerna exec -- yarn install",
 		"clean": "lerna exec -- yarn clean",
-		"clean_": "lerna exec -- yarn clean_"
+		"clean_": "lerna exec -- yarn clean_",
+		"link_global": "lerna exec -- yarn link",
+		"compile": "lerna exec -- yarn run compile"
 	},
 	"license": "MIT",
 	"devDependencies": {
 		"lerna": "^2.5.1",
-		"@types/node":"^8.0.54"
+		"@types/node": "^8.0.54"
 	}
 }

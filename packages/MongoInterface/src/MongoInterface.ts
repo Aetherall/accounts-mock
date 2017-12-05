@@ -43,13 +43,12 @@ export default class MongoInterface implements DatabaseInterface {
 
   waitForDatabaseConnection = async ( db: any ) => {
     // await to resolve connection to database
+
     this.db = await db;
 
-    console.log(this.db.Db);
+    this.userCollection = this.db.collection(this.config.userCollectionName);
 
-    this.userCollection = db.collection(this.config.userCollectionName);
-
-    this.sessionCollection = db.collection(this.config.sessionCollectionName);
+    this.sessionCollection = this.db.collection(this.config.sessionCollectionName);
   }
 
   mongoId = ( id: string , userOrSession: string ) => this.config.useMongoId[userOrSession] ? toMongoID(id) : id
