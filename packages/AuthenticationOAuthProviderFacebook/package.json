@@ -7,12 +7,13 @@
   "scripts": {
     "start": "tsc --watch",
     "clean": "rimraf lib",
+    "clean_": "rimraf node_modules",
     "precompile": "npm run clean",
     "compile": "tsc",
     "prepublish": "npm run compile"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "request-promise": "^4.2.2"
   },

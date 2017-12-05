@@ -7,12 +7,13 @@
   "scripts": {
     "start": "tsc --watch",
     "clean": "rimraf lib",
+    "clean_": "rimraf node_modules",
     "precompile": "npm run clean",
     "compile": "tsc",
     "prepublish": "npm run compile"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@accounts/server": "^1.0.0",
     "@accounts/token": "^1.0.0",
@@ -20,6 +21,7 @@
     "@types/node": "^8.0.54"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "lodash": "^4.17.4"
   }
 }
