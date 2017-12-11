@@ -51,16 +51,18 @@ export default class TransportExpress {
 		// Retrieve access token
 		const accessToken: string | null = this.tokenTransport.getAccessToken(req);
     console.log(accessToken);
-		if(!accessToken) next(); // If no accessToken from client => do nothing
+    
+    if(!accessToken) return next() // If no accessToken from client => do nothing
     
 		// If there is an accessToken provided by client => try to resume session
 		const user: UserSafe = await this.accountsServer.resumeSession(accessToken);
 
 		// Assign result of session resuming to request object 
 		req.user = user;
-		req.userId = user.id;
+    req.userId = user.id;
 
-		next();
+    next();
+    
   }
 
   send = ( res: any, data: any = {} ) : void => {
