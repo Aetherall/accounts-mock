@@ -47,11 +47,12 @@ export default class TransportExpress {
 
   // middleware
   middleware = async ( req: any, res: any, next: Function ) : Promise <void> => {
+
 		// Retrieve access token
 		const accessToken: string | null = this.tokenTransport.getAccessToken(req);
-
+    console.log(accessToken);
 		if(!accessToken) next(); // If no accessToken from client => do nothing
-
+    
 		// If there is an accessToken provided by client => try to resume session
 		const user: UserSafe = await this.accountsServer.resumeSession(accessToken);
 

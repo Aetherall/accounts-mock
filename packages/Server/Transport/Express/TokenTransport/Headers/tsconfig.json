@@ -1,11 +1,24 @@
 {
-  "extends": "../../tsconfig",
   "compilerOptions": {
+    // Global configuration
+    "target": "es5",
+    "module": "commonjs",
+    "lib": ["es6", "es7"],
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "strict": false,
+    "moduleResolution": "node",
+    "types": [
+      "@types/node"
+    ],
+
+    // Specific to this package
     "outDir": "./lib",
     "rootDir": "./src",
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
   },
   "exclude": [
     "node_modules",

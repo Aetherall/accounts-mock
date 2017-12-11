@@ -2,8 +2,8 @@
   "name": "@accounts/oauth",
   "version": "1.0.0",
   "description": "",
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "main": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
   "scripts": {
     "start": "tsc --watch",
     "clean": "rimraf lib",
