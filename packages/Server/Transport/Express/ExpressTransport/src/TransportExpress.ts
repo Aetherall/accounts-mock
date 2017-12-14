@@ -25,15 +25,14 @@ export default class TransportExpress {
 
     this.tokenTransport = config.tokenTransport;
 
-    this.path = config.path;
+    this.path = config.path || 'accounts';
 
-    this.router = Router()
-      .use(this.middleware)
-      .post(`${this.path}/impersonate`, this.impersonate)
-      .post(`${this.path}/user`, this.user)
-      .post(`${this.path}/refreshTokens`, this.refreshTokens)
-      .post(`${this.path}/logout`, this.logout)
-      .post(`${this.path}/:service/:provider?/:action`, this.useService)
+    this.router = Router({mergeParams: true})
+      .post(`/${this.path}/impersonate`, this.impersonate)
+      .post(`/${this.path}/user`, this.user)
+      .post(`/${this.path}/refreshTokens`, this.refreshTokens)
+      .post(`/${this.path}/logout`, this.logout)
+      .post(`/${this.path}/:service/:provider?/:action`, this.useService)
 
   }
 
@@ -45,7 +44,7 @@ export default class TransportExpress {
     
   }
 
-  // middleware
+  // middlewar  e
   middleware = async ( req: any, res: any, next: Function ) : Promise <void> => {
 
 		// Retrieve access token
@@ -92,6 +91,8 @@ export default class TransportExpress {
     
   user = async ( req: any, res: any ) : Promise <void> => {
 
+      console.log(req)
+
       const accessToken: string | null = this.tokenTransport.getAccessToken(req);
 
       const user : UserSafe = await this.accountsServer.resumeSession(accessToken);
@@ -132,7 +133,8 @@ export default class TransportExpress {
     // Extract the connection informations from the request
     const connectionInfo: ConnectionInformations = getConnectionInfo(req)
 
-    const { tokens, ...response } : any = await this.accountsServer.useService(target, params, connectionInfo);
+    const { tokens, ...response } : any = await this.accountsServer.useService(target, params, connectionInfo)
+      .catch(err => this.send(res, {error: err.message}));
 
     if(tokens) this.tokenTransport.setTokens(tokens, { req, res });
 

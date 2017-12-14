@@ -1,5 +1,5 @@
 {
-  "name": "@accounts/express-token-headers",
+  "name": "@accounts/client",
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -12,7 +12,7 @@
     "compile": "tsc",
     "prepublish": "yarn run compile"
   },
-  "author": "Elies Lou",
+  "author": "",
   "license": "MIT",
   "devDependencies": {
     "@types/accounts": "^1.0.0",

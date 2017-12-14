@@ -7,6 +7,8 @@ export interface AuthenticationService {
 
   useService( target: any, params: any, connectionInfos: ConnectionInformations) : any
 
+  link( accountServer:any ):any
+
 }
 
 export interface AuthenticationServices {

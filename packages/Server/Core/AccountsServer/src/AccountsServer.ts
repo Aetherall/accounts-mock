@@ -54,7 +54,7 @@ export default class AccountsServer {
 
 		this.authenticationServices = config.authenticationServices.reduce(
       ( a: AuthenticationServices, authenticationService: AuthenticationService ) =>
-    	({ ...a, [authenticationService.name]: authenticationService })
+    	({ ...a, [authenticationService.name]: authenticationService.link(this) })
 		,{})
 
 		this.notificationServices = config.notificationServices.reduce(

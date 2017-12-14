@@ -1,5 +1,7 @@
 import { TokenTransport, Tokens } from 'accounts';
 
+import { merge } from 'lodash';
+
 import { Configuration } from "./types/Configuration";
 import { TokenConfiguration } from "./types/TokenConfiguration";
 
@@ -21,11 +23,14 @@ export default class TokenTransportExpressHeaders implements TokenTransport {
   public accessConfig: TokenConfiguration;
   public refreshConfig: TokenConfiguration;
 
-  constructor( config: Configuration ) {
+  constructor( config?: Configuration ) {
+    
+    const access = config && config.access || {}
+    const refresh = config && config.refresh || {}
 
-    this.accessConfig = { ...defaultConfig.access, ...config.access };
+    this.accessConfig = merge({},defaultConfig.access, access)
 
-    this.refreshConfig = { ...defaultConfig.refresh, ...config.refresh };
+    this.refreshConfig = merge({},defaultConfig.refresh, refresh)
 
   }
 

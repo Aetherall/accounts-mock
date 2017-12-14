@@ -10,7 +10,7 @@ const defaultConfiguration: MongoInterfaceConfiguration = {
   userCollectionName: 'users',
   sessionCollectionName: 'sessions',
   idProvider: undefined,
-  dateProvider: undefined,
+  dateProvider: ()=>new Date('now'),
   caseSensitiveUserName: true,
   timestamps: {
     createdAt: 'createdAt',
@@ -61,7 +61,7 @@ export default class MongoInterface implements DatabaseInterface {
 
     const user = {
       services: {
-        ...password && { bcrypt: password },
+        ...password && {password:{ bcrypt: password }},
       },
       ...email && { emails: [{ address: email.toLowerCase(), verified: false }] },
       ...username && { username },

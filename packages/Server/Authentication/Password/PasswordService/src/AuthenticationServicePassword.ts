@@ -100,17 +100,23 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const { username, email, password } = params;
 
-    if( !username && !email ) throw new Error('Username or Email is required');
+    if( !username && !email ) 
+        throw new Error('[ Accounts - Password ] Register : Username or Email is required');
 
-    if( username && !this.config.validation.username(username) ) throw new Error(' Username does not pass validation ')
+    if( username && !this.config.validation.username(username) ) 
+        throw new Error('[ Accounts - Password ] Register : Username does not pass validation ')
 
-    if( email && !this.config.validation.email(email) ) throw new Error(' Email does not pass validation ')
+    if( email && !this.config.validation.email(email) ) 
+        throw new Error('[ Accounts - Password ] Register : Email does not pass validation ')
 
-    if( password && !this.config.validation.password(password) ) throw new Error(' Password does not pass validation ')
+    if( password && !this.config.validation.password(password) ) 
+        throw new Error('[ Accounts - Password ] Register : Password does not pass validation ')
 
-    if (username && (await this.databaseInterface.findUserByUsername(username))) throw new Error('Username already exists');
+    if (username && (await this.databaseInterface.findUserByUsername(username))) 
+        throw new Error('[ Accounts - Password ] Register : Username already exists');
 
-    if (email && (await this.databaseInterface.findUserByEmail(email))) throw new Error('Email already exists');
+    if (email && (await this.databaseInterface.findUserByEmail(email))) 
+        throw new Error('[ Accounts - Password ] Register : Email already exists');
 
     const newUser: UserPasswordRegistration = {
       ...username && { username },
@@ -131,7 +137,8 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const user: User = await this.databaseInterface.findUserByEmailVerificationToken(token);
 
-    if (!user) throw new Error('Verify email link expired');
+    if (!user) 
+        throw new Error('[ Accounts - Password ] verifyEmail : Verify email link expired');
 
     const verificationTokens: TokenRecord[] = get(user,'services.email.verificationTokens', []);
 
@@ -141,7 +148,8 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const emailRecord: EmailRecord = userEmails.find( ( e:EmailRecord ) => e.address === tokenRecord.address );
 
-    if(!emailRecord) throw new Error('Verify email link is for unknown address');
+    if(!emailRecord) 
+        throw new Error('[ Accounts - Password ] verifyEmail : Verify email link is for unknown address');
 
     await this.databaseInterface.verifyEmail(user.id, emailRecord.address);
 
@@ -157,7 +165,8 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const dbUser: User = await this.databaseInterface.findUserByResetPasswordToken(token);
 
-    if (!dbUser) throw new Error('Reset password link expired');
+    if (!dbUser) 
+        throw new Error('[ Accounts - Password ] resetPassword : Reset password link expired');
 
     // TODO move this getter into a password service module
 
@@ -165,13 +174,13 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const resetTokenRecord: TokenRecord = resetTokens.find(( t: TokenRecord ) => t.token === token )
 
-    if (this.accountsServer.tokenManager.isTokenExpired(token, resetTokenRecord)) {
-      throw new Error('Reset password link expired');
-    }
+    if (this.accountsServer.tokenManager.isTokenExpired(token, resetTokenRecord))
+        throw new Error('[ Accounts - Password ] resetPassword : Reset password link expired');
 
     const emails: EmailRecord[] = dbUser.emails || [];
 
-    if(!emails.find( e => e.address === resetTokenRecord.address )) throw new Error('Token has invalid email address')
+    if(!emails.find( e => e.address === resetTokenRecord.address )) 
+        throw new Error('[ Accounts - Password ] resetPassword : Token has invalid email address')
     
     const password: string = await this.hashAndBcryptPassword(newPassword);
 
@@ -191,15 +200,18 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
   public sendVerificationEmail = async ({ address }: { address: string }) : Promise <Message> => {
 
-    if(!address) throw new Error('Invalid email');
+    if(!address) 
+        throw new Error('[ Accounts - Password ] sendVerificationEmail : Invalid email');
 
     const dbUser: User = await this.databaseInterface.findUserByEmail(address);
 
-    if (!dbUser) throw new Error('User not found');
+    if (!dbUser) 
+        throw new Error('[ Accounts - Password ] sendVerificationEmail : User not found');
 
     const emails: EmailRecord[] = dbUser.emails || [];
 
-    if (!emails.find( ( e: EmailRecord ) => e.address === address )) throw new Error('No such email address for user');
+    if (!emails.find( ( e: EmailRecord ) => e.address === address )) 
+        throw new Error('[ Accounts - Password ] sendVerificationEmail : No such email address for user');
 
     const token: string = this.tokenManager.generateRandom();
 
@@ -217,11 +229,13 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
   public sendResetPasswordEmail = async ({ address }: { address: string }) : Promise <Message> => {
 
-    if(!address) throw new Error('Invalid email');
+    if(!address) 
+        throw new Error('[ Accounts - Password ] sendResetPasswordEmail : Invalid email');
 
     const dbUser: User = await this.databaseInterface.findUserByEmail(address);
     
-    if (!dbUser) throw new Error('User not found');
+    if (!dbUser) 
+        throw new Error('[ Accounts - Password ] sendResetPasswordEmail : User not found');
 
     const email = getFirstUserEmail(dbUser, address);
 
@@ -241,7 +255,8 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
   public authenticate = async ({ username, email, userId, password } : UserPasswordLogin, connectionInfo: ConnectionInformations) : Promise <LoginResult> => {
 
-    if(!username && !email && !userId) throw new Error('Username, Email or userId is Required');
+    if(!username && !email && !userId) 
+        throw new Error('[ Accounts - Password ] authenticate : Username, Email or userId is Required');
 
     // Fetch the user from database
     const user: User | null = userId ? await this.databaseInterface.findUserById(userId)
@@ -249,17 +264,20 @@ export default class AuthenticationServicePassword implements AuthenticationServ
       : email ? await this.databaseInterface.findUserByEmail(email)
       : null
 
-    if(!user) throw new Error('User Not Found');
+    if(!user) 
+        throw new Error('[ Accounts - Password ] authenticate : User Not Found');
 
     const hash: string = await this.databaseInterface.findPasswordHash(user.id);
 
-    if (!hash) throw new Error('User has no password set');
+    if (!hash) 
+        throw new Error('[ Accounts - Password ] authenticate : User has no password set');
 
     const hashedPassword: string = this.hashPassword( password )
 
     const isPasswordValid: boolean = await verifyPassword(hashedPassword, hash)
 
-    if (!isPasswordValid) throw new Error('Incorrect password');
+    if (!isPasswordValid) 
+        throw new Error('[ Accounts - Password ] authenticate : Incorrect password');
 
     const loginResult: LoginResult = await this.accountsServer.loginWithUser(user, connectionInfo);
 

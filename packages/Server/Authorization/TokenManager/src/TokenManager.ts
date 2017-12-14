@@ -3,7 +3,7 @@ import { TokenPayload, RefreshTokenPayload, TokenRecord, TokenManagerInterface }
 import { TokenGenerationConfiguration } from './types/TokenGenerationConfiguration';
 import { TokenManagerConfiguration } from './types/TokenManagerConfiguration';
 
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { randomBytes } from 'crypto';
 
 type JWTsignOptions = {
@@ -13,8 +13,8 @@ type JWTsignOptions = {
 }
 
 const defaultTokenConfig: TokenGenerationConfiguration = {
-    algorithm:undefined,
-    expiresIn:undefined,
+    algorithm:'HS256',
+    /*expiresIn:undefined,
     notBefore:undefined,
     audience:undefined,
     /*jwtid:null,
@@ -44,7 +44,7 @@ export default class TokenManager implements TokenManagerInterface {
         this.emailTokensExpiration = config.emailTokensExpiration | 1000;
         this.accessTokenConfig = { ...defaultTokenConfig, ...defaultAccessTokenConfig, ...config.access };
         this.refreshTokenConfig = { ...defaultTokenConfig, ...defaultRefreshTokenConfig, ...config.refresh };
-    }n
+    }
 
     generateRandom = ( length: number | undefined = 43 ) => randomBytes(length).toString('hex');
 
@@ -57,5 +57,5 @@ export default class TokenManager implements TokenManagerInterface {
 
     decode = async ( token: string, ignoreExpiration: boolean = false ) : Promise <TokenPayload> => 
         await jwt.verify(token, this.secret, { ignoreExpiration } )
-        .catch( ( err: Error ) => { throw new Error(' [ Accounts - TokenManager ] Token is invalid ') } )
+       //.catch( ( err: Error ) => { throw new Error(' [ Accounts - TokenManager ] Token is invalid ') } )
 }
