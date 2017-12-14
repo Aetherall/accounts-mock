@@ -2,8 +2,8 @@
 export interface CookieDirectives {
   secure?: boolean,
   httpOnly?: boolean,
-  expires?: string,
-  maxAge?: string,
+  expires?: number,
+  maxAge?: Date,
   domain?: boolean | string,
   path?: string,
   sameSite?: string

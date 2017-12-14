@@ -24,13 +24,14 @@ export default class TokenTransportExpressBody implements TokenTransport {
   public accessConfig: TokenConfiguration;
   public refreshConfig: TokenConfiguration;
 
-  constructor( config: Configuration ) {
-    const configuration = merge({}, defaultConfig, config)
+  constructor( config?: Configuration ) {
+
+    const access = config && config.access || {}
+    const refresh = config && config.refresh || {}
+
+    this.accessConfig = merge({},defaultConfig.access, access)
+    this.refreshConfig = merge({},defaultConfig.refresh, refresh)
     
-    this.accessConfig = configuration.access;
-
-    this.refreshConfig = configuration.refresh
-
   }
 
   setAccessToken = ( accessToken: string, { req, res } : any ) : void => {

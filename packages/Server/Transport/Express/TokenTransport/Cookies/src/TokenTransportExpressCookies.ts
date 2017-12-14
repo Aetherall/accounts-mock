@@ -1,5 +1,7 @@
 import { TokenTransport, Tokens } from 'accounts';
 
+import { merge } from 'lodash';
+
 import { Configuration } from "./types/Configuration"
 import { TokenConfiguration } from "./types/TokenConfiguration"
 
@@ -9,8 +11,8 @@ const defaultConfig: Configuration  = {
     canStore: () => true,
     secure: true,
     httpOnly: true,
-    expires: '1d',
-    maxAge: '1d',
+    expires: new Date( new Date().getTime() + (1000*60*20)),
+    maxAge: 1000*60*20,
     domain: false,
     path: '/',
     sameSite: 'Strict'
@@ -20,8 +22,8 @@ const defaultConfig: Configuration  = {
     canStore: () => true,
     secure: true,
     httpOnly: true,
-    expires: '1d',
-    maxAge: '1d',
+    expires: new Date( new Date().getTime() + (1000*60*20)),
+    maxAge: 1000*60*20,
     domain: false,
     path: '/',
     sameSite: 'Strict'
@@ -33,11 +35,13 @@ export default class TokenTransportExpressCookies implements TokenTransport {
   public accessConfig: TokenConfiguration;
   public refreshConfig: TokenConfiguration;
 
-  constructor( config: Configuration ) {
+  constructor( config?: Configuration ) {
 
-    this.accessConfig = { ...defaultConfig.access, ...config.access }
+    const access = config && config.access || {}
+    const refresh = config && config.refresh || {}
 
-    this.refreshConfig = { ...defaultConfig.refresh, ...config.refresh }
+    this.accessConfig = merge({},defaultConfig.access, access)
+    this.refreshConfig = merge({},defaultConfig.refresh, refresh)
 
   }
 
@@ -73,9 +77,9 @@ export default class TokenTransportExpressCookies implements TokenTransport {
 
   }
 
-  getAccessToken = ( req: any ) : string | undefined => req.cookie[this.accessConfig.name]
+  getAccessToken = ( req: any ) : string | undefined => req.cookies[this.accessConfig.name]
 
-  getRefreshToken = ( req: any ) : string | undefined => req.cookie[this.refreshConfig.name]
+  getRefreshToken = ( req: any ) : string | undefined => req.cookies[this.refreshConfig.name]
 
   getTokens = ( req: any ) : Tokens => ({
     accessToken: this.getAccessToken(req),

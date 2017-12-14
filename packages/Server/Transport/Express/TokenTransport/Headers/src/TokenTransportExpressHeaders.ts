@@ -29,7 +29,6 @@ export default class TokenTransportExpressHeaders implements TokenTransport {
     const refresh = config && config.refresh || {}
 
     this.accessConfig = merge({},defaultConfig.access, access)
-
     this.refreshConfig = merge({},defaultConfig.refresh, refresh)
 
   }
