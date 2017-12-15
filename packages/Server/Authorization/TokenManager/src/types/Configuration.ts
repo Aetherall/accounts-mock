@@ -1,6 +1,6 @@
 import { TokenGenerationConfiguration } from "./TokenGenerationConfiguration";
 
-export interface TokenManagerConfiguration {
+export interface Configuration {
   
   secret: string;
 

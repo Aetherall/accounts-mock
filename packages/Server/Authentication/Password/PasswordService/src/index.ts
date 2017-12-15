@@ -1,1 +1,1 @@
-export { default } from './AuthenticationServicePassword';
+export { default } from './PasswordService';

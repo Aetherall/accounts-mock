@@ -2,37 +2,38 @@ import AccountsServer from '@accounts/server';
 
 import { 
   AuthenticationService, 
-  DatabaseInterface,
   ConnectionInformations,
-  User,
-  TokenRecord,
+  DatabaseInterface,
   EmailRecord,
   LoginResult,
-  RegistrationResult,
   Message,
-  TokenManagerInterface
+  RegistrationResult,
+  TokenManagerInterface,
+  TokenRecord,
+  User,
 } from 'accounts';
 
-import { UserPasswordRegistration } from './types/UserPasswordRegistration';
-import { HashAlgorithm } from './types/HashAlgorithm';
-import { PasswordServiceConfiguration } from './types/PasswordServiceConfiguration';
-import { UserPasswordLogin } from './types/UserPasswordLogin';
-import { Password } from './types/Password';
+import { Configuration } from './types/Configuration';
 
-import { merge, get } from 'lodash';
+import { HashAlgorithm } from './types/HashAlgorithm';
+import { Password } from './types/Password';
+import { UserPasswordLogin } from './types/UserPasswordLogin';
+import { UserPasswordRegistration } from './types/UserPasswordRegistration';
+
+import { get, merge } from 'lodash';
 
 import { getFirstUserEmail } from './utils/getFirstUserEmail';
-import { getHashPassword } from './utils/hashPassword';
 import { getHashAndBcryptPassword } from './utils/hashAndBcryptPassword';
+import { getHashPassword } from './utils/hashPassword';
 import { verifyPassword } from './utils/verifyPassword';
 
 
-const defaultConfiguration: PasswordServiceConfiguration = {
+const defaultConfiguration: Configuration = {
   
   validation: {
-    username: () => true,
     email: () => true,
-    password: () => true
+    password: () => true,
+    username: () => true,
   },
 
   passwordHashAlgorithm: 'sha256',
@@ -44,7 +45,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
   public name: string = 'password';
 
-  private config: PasswordServiceConfiguration;
+  private config: Configuration;
 
   public accountsServer: AccountsServer;
 
@@ -58,7 +59,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
   private hashAndBcryptPassword: ( password: Password ) => Promise <string>;
 
 
-  constructor( config?: PasswordServiceConfiguration ){
+  constructor( config?: Configuration ){
 
     this.config = merge({}, defaultConfiguration, config);
 
@@ -68,7 +69,7 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
   }
 
-  link = ( accountsServer: AccountsServer ) : this => {
+  public link = ( accountsServer: AccountsServer ) : this => {
     
     this.accountsServer = accountsServer;
     
@@ -88,7 +89,8 @@ export default class AuthenticationServicePassword implements AuthenticationServ
 
     const action: Function = this[actionName];
 
-    if(!action) throw new Error(`[ Accounts - Password ] useService : No action matches ${actionName} `)
+		if(!action) 
+				throw new Error(`[ Accounts - Password ] useService : No action matches ${actionName} `)
     
     return action( params, connectionInfo )
 

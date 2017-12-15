@@ -1,4 +1,4 @@
-import { User, EmailRecord } from 'accounts';
+import { EmailRecord, User } from 'accounts';
 
 
 export const getFirstUserEmail = ( user: User, address: string ): string => {

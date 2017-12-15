@@ -1,8 +1,15 @@
-import { ConnectionInformations, TokenTransport, UserSafe, ImpersonationResult, Tokens, LoginResult } from 'accounts';
-
-import { ExpressTransportConfiguration } from './types/ExpressTransportConfiguration';
-
 import AccountsServer from '@accounts/server';
+
+import { 
+  ConnectionInformations, 
+  ImpersonationResult, 
+  LoginResult, 
+  Tokens, 
+  TokenTransport, 
+  UserSafe  
+} from 'accounts';
+
+import { Configuration } from './types/Configuration';
 
 import { Router } from 'express';
 
@@ -19,7 +26,7 @@ export default class TransportExpress {
 	private path: string;
 	
 
-  constructor( config: ExpressTransportConfiguration ){
+  constructor( config: Configuration ){
 
     this.accountsServer = config.accountsServer;
 
@@ -27,7 +34,7 @@ export default class TransportExpress {
 
     this.path = config.path || 'accounts';
 
-    this.router = Router({mergeParams: true})
+    this.router = Router({ mergeParams: true })
       .post(`/${this.path}/impersonate`, this.impersonate)
       .post(`/${this.path}/user`, this.user)
       .post(`/${this.path}/refreshTokens`, this.refreshTokens)
@@ -36,7 +43,7 @@ export default class TransportExpress {
 
   }
 
-  link = ( accountsServer: AccountsServer ) : this => {
+  public link = ( accountsServer: AccountsServer ) : this => {
     
     this.accountsServer = accountsServer;
         
@@ -45,11 +52,10 @@ export default class TransportExpress {
   }
 
   // middlewar  e
-  middleware = async ( req: any, res: any, next: Function ) : Promise <void> => {
+  public middleware = async ( req: any, res: any, next: Function ) : Promise <void> => {
 
 		// Retrieve access token
 		const accessToken: string | null = this.tokenTransport.getAccessToken(req);
-    console.log(accessToken);
     
     if(!accessToken) return next() // If no accessToken from client => do nothing
     
@@ -64,7 +70,7 @@ export default class TransportExpress {
     
   }
 
-  send = ( res: any, data: any = {} ) : void => {
+  private send = ( res: any, data: any = {} ) : void => {
 
     const toSend: any = res.toSend || {};
 
@@ -73,7 +79,7 @@ export default class TransportExpress {
 
 
 
-  impersonate = async ( req: any, res: any ) : Promise <void> => {
+  private impersonate = async ( req: any, res: any ) : Promise <void> => {
       
       const username: string = req.body.username;
 
@@ -89,9 +95,7 @@ export default class TransportExpress {
 
   } 
     
-  user = async ( req: any, res: any ) : Promise <void> => {
-
-      console.log(req)
+  private user = async ( req: any, res: any ) : Promise <void> => {
 
       const accessToken: string | null = this.tokenTransport.getAccessToken(req);
 
@@ -100,7 +104,7 @@ export default class TransportExpress {
       this.send(res, user)
   }
 
-  refreshTokens = async ( req: any, res: any ) : Promise <void> => {
+  private refreshTokens = async ( req: any, res: any ) : Promise <void> => {
 
       const requestTokens: Tokens = this.tokenTransport.getTokens(req);
 
@@ -113,7 +117,7 @@ export default class TransportExpress {
       this.send(res, { user, sessionId });
   }
 
-  logout = async ( req: any, res: any ) : Promise <void> => {
+  private logout = async ( req: any, res: any ) : Promise <void> => {
 
       const accessToken: string | null = this.tokenTransport.getAccessToken(req);
 
@@ -123,7 +127,7 @@ export default class TransportExpress {
       
   }
 
-  useService = async ( req: any, res: any ) : Promise <void> => {
+  private useService = async ( req: any, res: any ) : Promise <void> => {
     // Identify the service
     const target: any = req.params;
 

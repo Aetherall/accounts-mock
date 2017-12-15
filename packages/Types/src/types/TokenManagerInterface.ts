@@ -1,5 +1,5 @@
-import { TokenRecord } from './TokenRecord';
 import { TokenPayload } from './TokenPayload';
+import { TokenRecord } from './TokenRecord';
 
 
 export interface TokenManagerInterface {

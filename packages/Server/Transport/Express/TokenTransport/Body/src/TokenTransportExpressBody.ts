@@ -1,4 +1,7 @@
-import { TokenTransport, Tokens } from 'accounts';
+import { 
+  Tokens, 
+  TokenTransport
+} from 'accounts';
 
 import { Configuration } from "./types/Configuration";
 import { TokenConfiguration } from "./types/TokenConfiguration";
@@ -10,12 +13,12 @@ import { merge } from "lodash";
 
 const defaultConfig: Configuration = {
   access: {
+    canStore: () => true,
     name: 'accessToken',
-    canStore: () => true
   },
   refresh: {
+    canStore: () => true,
     name: 'refreshToken',
-    canStore: () => true
   }
 }
 
@@ -34,7 +37,7 @@ export default class TokenTransportExpressBody implements TokenTransport {
     
   }
 
-  setAccessToken = ( accessToken: string, { req, res } : any ) : void => {
+  public setAccessToken = ( accessToken: string, { req, res } : any ) : void => {
 
     const canStore: boolean = this.accessConfig.canStore(req);
 
@@ -46,7 +49,7 @@ export default class TokenTransportExpressBody implements TokenTransport {
 
   }
 
-  setRefreshToken = ( refreshToken: string, { req, res } : any ) : void => {
+  public setRefreshToken = ( refreshToken: string, { req, res } : any ) : void => {
 
     const canStore: boolean = this.refreshConfig.canStore(req);
 
@@ -58,7 +61,7 @@ export default class TokenTransportExpressBody implements TokenTransport {
 
   }
 
-  setTokens = ( { accessToken, refreshToken } : Tokens, tokenContainer: any ) : void => {
+  public setTokens = ( { accessToken, refreshToken } : Tokens, tokenContainer: any ) : void => {
 
     this.setAccessToken(accessToken, tokenContainer);
 
@@ -66,11 +69,11 @@ export default class TokenTransportExpressBody implements TokenTransport {
 
   }
 
-  getAccessToken = ( req: any ) : string | undefined => req.body[this.accessConfig.name]
+  public getAccessToken = ( req: any ) : string | undefined => req.body[this.accessConfig.name]
 
-  getRefreshToken = ( req: any ) : string | undefined => req.body[this.refreshConfig.name]
+  public getRefreshToken = ( req: any ) : string | undefined => req.body[this.refreshConfig.name]
 
-  getTokens = ( req: any ) : Tokens => ({
+  public getTokens = ( req: any ) : Tokens => ({
     accessToken: this.getAccessToken(req),
     refreshToken: this.getRefreshToken(req)
   })

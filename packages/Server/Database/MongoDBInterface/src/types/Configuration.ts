@@ -7,7 +7,7 @@ export interface TimeStamps {
 
 }
 
-export interface useMongoId {
+export interface UseMongoId {
 
   user: boolean;
 
@@ -16,7 +16,7 @@ export interface useMongoId {
 }
 
 
-export interface MongoInterfaceConfiguration {
+export interface Configuration {
 
   userCollectionName?: string;
 
@@ -30,6 +30,6 @@ export interface MongoInterfaceConfiguration {
 
   timestamps?: TimeStamps;
 
-  useMongoId?: useMongoId;
+  useMongoId?: UseMongoId;
   
 }

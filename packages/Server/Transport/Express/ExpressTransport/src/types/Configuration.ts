@@ -1,15 +1,14 @@
-import { TokenTransport } from 'accounts';
-
 import AccountsServer from "@accounts/server";
 
-export interface ExpressTransportConfiguration {
+import { TokenTransport } from 'accounts';
+
+
+export interface Configuration {
   
   tokenTransport: TokenTransport;
 
   accountsServer?: AccountsServer;
 
   path?: string;
-
-  
 
 }

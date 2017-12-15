@@ -1,5 +1,5 @@
 export * from "./AccessTokenPayload";
-export * from "./AuthenticationOAuthProvider";
+export * from "./OAuthProvider";
 export * from "./AuthenticationService";
 export * from "./ConnectionInformations";
 export * from "./DatabaseInterface";

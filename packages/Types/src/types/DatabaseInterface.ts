@@ -1,6 +1,6 @@
-import { User } from "./User";
-import { Session } from "./Session";
 import { ConnectionInformations } from "./ConnectionInformations";
+import { Session } from "./Session";
+import { User } from "./User";
 
 export interface DatabaseInterface {
 

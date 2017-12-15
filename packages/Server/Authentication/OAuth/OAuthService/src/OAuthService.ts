@@ -1,16 +1,16 @@
 import { 
-  LoginResult, 
   AuthenticationService, 
-  DatabaseInterface, 
-  AuthenticationOAuthProviders, 
-  AuthenticationOAuthProvider,
   ConnectionInformations,
+  DatabaseInterface, 
+  LoginResult, 
+  OAuthProvider,
+  OAuthProviders, 
   User
 } from 'accounts';
 
 import AccountsServer from '@accounts/server';
 
-import { AuthenticationServiceOAuthConfiguration } from "./types/AuthenticationServiceOAuthConfiguration";
+import { Configuration } from "./types/Configuration";
 
 import { forEach } from 'lodash';
 
@@ -22,18 +22,18 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
 
   private databaseInterface: DatabaseInterface;
 
-  private authenticationProviders: AuthenticationOAuthProviders;
+  private authenticationProviders: OAuthProviders;
 
-  constructor(config: AuthenticationServiceOAuthConfiguration) {
+  constructor(config: Configuration) {
 
     this.authenticationProviders = config.authenticationProviders.reduce(
-      ( a: AuthenticationOAuthProviders, authenticationProvider: AuthenticationOAuthProvider ) =>
+      ( a: OAuthProviders, authenticationProvider: OAuthProvider ) =>
       a[authenticationProvider.name] = authenticationProvider
     ,{})
 
   }
 
-  link = ( accountsServer: AccountsServer ) : this => {
+  public link = ( accountsServer: AccountsServer ) : this => {
 
     this.accountsServer = accountsServer;
 
@@ -45,11 +45,11 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
 
   }
 
-  useService = (target, params, connectionInfo: ConnectionInformations ) : any => {
+  public useService = (target, params, connectionInfo: ConnectionInformations ) : any => {
 
     const providerName: string = target.provider;
     
-    const provider: AuthenticationOAuthProvider = this.authenticationProviders[providerName];
+    const provider: OAuthProvider = this.authenticationProviders[providerName];
     
     if(!provider) throw new Error(`[ Accounts - OAuth ] useService : No provider matches ${providerName} `)
     
@@ -66,7 +66,7 @@ export default class AuthenticationServiceOAuth implements AuthenticationService
     return providerAction( params, connectionInfo )
   }
 
-  public authenticate = async ( provider: AuthenticationOAuthProvider , params, connectionInfo: ConnectionInformations ) : Promise <LoginResult> => {
+  public authenticate = async ( provider: OAuthProvider , params, connectionInfo: ConnectionInformations ) : Promise <LoginResult> => {
 
     const oauthUser: any = await provider.authenticate(params)
 

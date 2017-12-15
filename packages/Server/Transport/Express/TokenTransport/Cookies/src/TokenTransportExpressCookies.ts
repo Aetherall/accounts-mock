@@ -1,29 +1,40 @@
-import { TokenTransport, Tokens } from 'accounts';
-
-import { merge } from 'lodash';
+import { 
+  Tokens, 
+  TokenTransport
+} from 'accounts';
 
 import { Configuration } from "./types/Configuration"
 import { TokenConfiguration } from "./types/TokenConfiguration"
 
+import { merge } from 'lodash';
+
 const defaultConfig: Configuration  = {
+
   access: {
-    name: 'accessToken',
     canStore: () => true,
-    secure: true,
+    name: 'accessToken',
+
     httpOnly: true,
+    secure: true,
+
     expires: new Date( new Date().getTime() + (1000*60*20)),
     maxAge: 1000*60*20,
+    
     domain: false,
     path: '/',
     sameSite: 'Strict'
   },
+
   refresh: {
-    name: 'refreshToken',
     canStore: () => true,
-    secure: true,
+    name: 'refreshToken',
+
     httpOnly: true,
+    secure: true,
+
     expires: new Date( new Date().getTime() + (1000*60*20)),
     maxAge: 1000*60*20,
+
     domain: false,
     path: '/',
     sameSite: 'Strict'
@@ -45,7 +56,7 @@ export default class TokenTransportExpressCookies implements TokenTransport {
 
   }
 
-  setAccessToken = ( accessToken: string, { req, res } : any ) : void => {
+  public setAccessToken = ( accessToken: string, { req, res } : any ) : void => {
 
     const canStore: boolean = this.accessConfig.canStore(req);
 
@@ -57,7 +68,7 @@ export default class TokenTransportExpressCookies implements TokenTransport {
 
   }
 
-  setRefreshToken = ( refreshToken: string, { req, res } : any ) : void => {
+  public setRefreshToken = ( refreshToken: string, { req, res } : any ) : void => {
 
     const canStore: boolean = this.refreshConfig.canStore(req);
 
@@ -69,7 +80,7 @@ export default class TokenTransportExpressCookies implements TokenTransport {
 
   }
 
-  setTokens = ( { accessToken, refreshToken } : Tokens , tokenContainer: any ) : void => {
+  public setTokens = ( { accessToken, refreshToken } : Tokens , tokenContainer: any ) : void => {
 
     this.setAccessToken(accessToken, tokenContainer);
 
@@ -77,11 +88,11 @@ export default class TokenTransportExpressCookies implements TokenTransport {
 
   }
 
-  getAccessToken = ( req: any ) : string | undefined => req.cookies[this.accessConfig.name]
+  public getAccessToken = ( req: any ) : string | undefined => req.cookies[this.accessConfig.name]
 
-  getRefreshToken = ( req: any ) : string | undefined => req.cookies[this.refreshConfig.name]
+  public getRefreshToken = ( req: any ) : string | undefined => req.cookies[this.refreshConfig.name]
 
-  getTokens = ( req: any ) : Tokens => ({
+  public getTokens = ( req: any ) : Tokens => ({
     accessToken: this.getAccessToken(req),
     refreshToken: this.getRefreshToken(req)
   })

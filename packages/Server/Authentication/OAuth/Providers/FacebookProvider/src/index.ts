@@ -1,1 +1,1 @@
-export { default } from './AuthenticationOAuthProviderFacebook';
+export { default } from './FacebookProvider';

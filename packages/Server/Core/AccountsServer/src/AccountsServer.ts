@@ -1,18 +1,18 @@
 import { 
-	AuthenticationServices, 
 	AuthenticationService,
-	DatabaseInterface,
+	AuthenticationServices, 
 	ConnectionInformations,
+	DatabaseInterface,
+	ImpersonationResult,
+	LoginResult,
+	NotificationService,
+	NotificationServices,
+	Session,
+	TokenManagerInterface,
+	TokenPayload,
+	Tokens,
 	User,
 	UserSafe,
-	Session,
-	Tokens,
-	LoginResult,
-	ImpersonationResult,
-	NotificationServices,
-	NotificationService,
-	TokenPayload,
-	TokenManagerInterface
 } from 'accounts';
 
 import { AccountsServerConfiguration, ImpersonationAuthorize, ResumeSessionValidator } from "./types/AccountsServerConfiguration";
@@ -64,7 +64,7 @@ export default class AccountsServer {
 		
 	}
   
-	checkconfig = ( config: AccountsServerConfiguration ) : void => {
+	private checkconfig = ( config: AccountsServerConfiguration ) : void => {
 
 		if( !config.databaseInterface ) 
 			throw new Error('[ Accounts - Server ] Init : A database interface is required');
@@ -74,7 +74,7 @@ export default class AccountsServer {
 		
 	}
 
-	useNotificationService = ( notificationServiceName: string ) => {
+	public useNotificationService = ( notificationServiceName: string ) => {
 
 		const notificationService: NotificationService = this.notificationServices[notificationServiceName]
 
@@ -85,7 +85,7 @@ export default class AccountsServer {
 	}
 
 
-	useService = ( target: any, params: any, connectionInfo: ConnectionInformations ) : any => {
+	public useService = ( target: any, params: any, connectionInfo: ConnectionInformations ) : any => {
 		
 		const { service, ...serviceParams } = target;
 
@@ -99,7 +99,7 @@ export default class AccountsServer {
 	}
   
   
-	loginWithUser = async ( dbUser: User, connectionInfo: ConnectionInformations ) : Promise <LoginResult>  => {
+	public loginWithUser = async ( dbUser: User, connectionInfo: ConnectionInformations ) : Promise <LoginResult>  => {
 
 		const sessionId: string = await this.databaseInterface.createSession(dbUser.id, connectionInfo);
 
@@ -116,7 +116,7 @@ export default class AccountsServer {
 
 	}
   
-	impersonate = async ( accessToken: string, username: string, connectionInfo: ConnectionInformations ) : Promise <ImpersonationResult> => {
+	public impersonate = async ( accessToken: string, username: string, connectionInfo: ConnectionInformations ) : Promise <ImpersonationResult> => {
 
 		if (typeof accessToken !== 'string' ) 
 			throw new Error('[ Accounts - Server ] Impersonate : An accessToken is required');
@@ -160,7 +160,7 @@ export default class AccountsServer {
 
 	}
       
-	createTokens = ( sessionId: string, isImpersonated?: boolean ) : Tokens => {
+	public createTokens = ( sessionId: string, isImpersonated?: boolean ) : Tokens => {
 
 		const accessToken: string = this.tokenManager.generateAccess({ sessionId, isImpersonated });
 
@@ -172,7 +172,7 @@ export default class AccountsServer {
 
 	}
   
-	refreshTokens = async ( tokens: Tokens, connectionInfo: ConnectionInformations ) : Promise <LoginResult> => {
+	public refreshTokens = async ( tokens: Tokens, connectionInfo: ConnectionInformations ) : Promise <LoginResult> => {
 
 		const { accessToken, refreshToken } = tokens;
 
@@ -201,9 +201,9 @@ export default class AccountsServer {
 		await this.databaseInterface.updateSession(sessionId, connectionInfo);
 
 		const loginResult: LoginResult = {
-				sessionId, 
-				user: this.sanitizeUser(user),
-				tokens: newTokens
+			sessionId, 
+			tokens: newTokens,
+			user: this.sanitizeUser(user),
 		}
 
 		return loginResult
@@ -211,7 +211,7 @@ export default class AccountsServer {
 	}
   
   
-	logout = async ( accessToken: string ) : Promise <void> => {
+	public logout = async ( accessToken: string ) : Promise <void> => {
 
 		const session: Session = await this.findSessionByAccessToken(accessToken);
 
@@ -228,7 +228,7 @@ export default class AccountsServer {
 	}
   
   
-	resumeSession = async ( accessToken: string ) : Promise <UserSafe> => {
+	public resumeSession = async ( accessToken: string ) : Promise <UserSafe> => {
 
 		const session: Session = await this.findSessionByAccessToken(accessToken);
 
@@ -248,7 +248,7 @@ export default class AccountsServer {
 	}
   
   
-	findSessionByAccessToken = async ( accessToken: string ) : Promise <Session> =>  {
+	public findSessionByAccessToken = async ( accessToken: string ) : Promise <Session> =>  {
 
 		if (typeof accessToken !== 'string' ) 
 			throw new Error('An accessToken is required');
@@ -266,7 +266,7 @@ export default class AccountsServer {
 
 	}
 
-	sanitizeUser = ( user: User ) : UserSafe => {
+	public sanitizeUser = ( user: User ) : UserSafe => {
 		const { services, ...usersafe } = user;
 		return usersafe
 	}

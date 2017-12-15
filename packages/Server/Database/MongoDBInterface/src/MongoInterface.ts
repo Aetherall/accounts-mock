@@ -1,30 +1,36 @@
-import { DatabaseInterface, User, Session, ConnectionInformations } from 'accounts';
+import { ConnectionInformations, DatabaseInterface, Session, User  } from 'accounts';
 
-import { MongoInterfaceConfiguration } from './types/MongoInterfaceConfiguration';
+import { Configuration } from './types/Configuration';
 
 import { get, merge } from 'lodash';
 import { toMongoID } from './utils/toMongoId';
 
 
-const defaultConfiguration: MongoInterfaceConfiguration = {
-  userCollectionName: 'users',
+const defaultConfiguration: Configuration = {
+
   sessionCollectionName: 'sessions',
-  idProvider: undefined,
-  dateProvider: ()=>new Date('now'),
+  userCollectionName: 'users',
+
   caseSensitiveUserName: true,
+
+  dateProvider: ()=>new Date('now'),
+  idProvider: undefined,
+
   timestamps: {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   },
+
   useMongoId:{
+    session: true,
     user: true,
-    session: true
   }
+
 }
 
 export default class MongoInterface implements DatabaseInterface {
   
-  private config: MongoInterfaceConfiguration;
+  private config: Configuration;
 
   private db: any;
 
@@ -33,7 +39,7 @@ export default class MongoInterface implements DatabaseInterface {
   private sessionCollection: any;
 
 
-  constructor( db: any, config?: MongoInterfaceConfiguration ){
+  constructor( db: any, config?: Configuration ){
 
     this.config = merge({},defaultConfiguration, config);
     
@@ -41,7 +47,7 @@ export default class MongoInterface implements DatabaseInterface {
   }
   
 
-  waitForDatabaseConnection = async ( db: any ) => {
+  private waitForDatabaseConnection = async ( db: any ) => {
     // await to resolve connection to database
 
     this.db = await db;
@@ -51,13 +57,11 @@ export default class MongoInterface implements DatabaseInterface {
     this.sessionCollection = this.db.collection(this.config.sessionCollectionName);
   }
 
-  mongoId = ( id: string , userOrSession: string ) => this.config.useMongoId[userOrSession] ? toMongoID(id) : id
+  private mongoId = ( id: string , userOrSession: string ) => this.config.useMongoId[userOrSession] ? toMongoID(id) : id
 
-  provideId = () => this.config.idProvider && { _id: this.config.idProvider() }
+  private provideId = () => this.config.idProvider && { _id: this.config.idProvider() }
 
-  
-
-  createUser = async ({ email, username, password } : { email: string, username: string, password: string }) : Promise <string> => {
+  public createUser = async ({ email, username, password } : { email: string, username: string, password: string }) : Promise <string> => {
 
     const user = {
       services: {
@@ -198,11 +202,11 @@ export default class MongoInterface implements DatabaseInterface {
     const filter = { _id: id, 'emails.address': email };
 
     const modifier = {
+      $pull: { 'services.email.verificationTokens': { address: email } },
       $set: {
         'emails.$.verified': true,
         [this.config.timestamps.updatedAt]: Date.now(),
       },
-      $pull: { 'services.email.verificationTokens': { address: email } },
     }
 
     const ret = await this.userCollection.update( filter, modifier );
@@ -265,7 +269,7 @@ export default class MongoInterface implements DatabaseInterface {
     }
 
     const ret = await this.userCollection.update( filter, modifier );
-    //added =>
+    // added =>
     if (ret.result.nModified === 0) throw new Error('User not found');
 
     return service;
@@ -275,9 +279,9 @@ export default class MongoInterface implements DatabaseInterface {
 
     const session = {
       ...this.provideId(),
-      userId,
       connectionInformations,
       extraData,
+      userId,
       valid: true,
       [this.config.timestamps.createdAt]: this.config.dateProvider(),
       [this.config.timestamps.updatedAt]: this.config.dateProvider(),
@@ -354,8 +358,8 @@ export default class MongoInterface implements DatabaseInterface {
     const modifier = {
       $push: {
         'services.email.verificationTokens': {
-          token,
           address: email.toLowerCase(),
+          token,
           when: Date.now(),
         },
       },
@@ -373,10 +377,10 @@ export default class MongoInterface implements DatabaseInterface {
     const modifier = {
       $push: {
         'services.password.reset': {
-          token,
           address: email.toLowerCase(),
-          when: Date.now(),
           reason,
+          token,
+          when: Date.now(),
         },
       },
     }

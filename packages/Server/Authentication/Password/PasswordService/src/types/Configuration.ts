@@ -1,6 +1,6 @@
 import { HashAlgorithm } from "./HashAlgorithm";
 
-export interface PasswordServiceConfiguration {
+export interface Configuration {
   
     validation ?: {
 

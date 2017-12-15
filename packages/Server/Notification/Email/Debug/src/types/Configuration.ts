@@ -1,6 +1,6 @@
 import { NotificationPlugin } from 'accounts';
 
-export interface NotificationServiceDebugConfiguration {
+export interface Configuration {
 
   notificationPlugins: NotificationPlugin[]
 

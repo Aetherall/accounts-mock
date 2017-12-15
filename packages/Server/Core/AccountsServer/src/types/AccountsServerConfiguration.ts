@@ -1,10 +1,10 @@
 import { 
-  DatabaseInterface,
-  TokenManagerInterface,
   AuthenticationService,
-  User,
+  DatabaseInterface,
+  NotificationService,
   Session,
-  NotificationService
+  TokenManagerInterface,
+  User,
 } from 'accounts';
 
 
